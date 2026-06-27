@@ -2,10 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
 import { HeartFill } from "@gravity-ui/icons";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "react-toastify";
 
 export default function Login() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -18,7 +22,6 @@ export default function Login() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing again
     if (error) setError("");
   };
 
@@ -34,28 +37,35 @@ export default function Login() {
     }
 
     try {
-      // Simulate an API call for JWT Authentication
-      // Replace this block with your actual fetch/axios call to your auth endpoint
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          if (formData.email === "test@example.com" && formData.password === "password123") {
-            resolve({ token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.simulated_token" });
-          } else {
-            reject(new Error("Invalid email or password."));
-          }
-        }, 1000);
+      // Execute genuine better-auth email sign in
+      const { data, error: authError } = await authClient.signIn.email({
+        email: formData.email,
+        password: formData.password,
+        callbackURL: "/", // Destination upon successful processing
       });
 
-      // Handle Success (e.g., save JWT to localStorage/cookies and redirect)
-      console.log("Login successful! JWT Received.");
-      // localStorage.setItem("token", response.token);
-      // router.push("/dashboard");
-
+      if (authError) {
+        setError(authError.message || "Invalid email or password.");
+      } else {
+        toast.success("Login successful!", data);
+        router.push("/"); // Direct user to home page base
+      }
     } catch (err) {
-      // Handle Error
-      setError(err.message || "Something went wrong. Please try again.");
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError("");
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/", // Destination upon returning from Google auth
+      });
+    } catch (err) {
+      setError("Failed to initialize Google authentication.");
     }
   };
 
@@ -101,7 +111,7 @@ export default function Login() {
           <p className="text-gray-500 text-sm text-center sm:text-left w-full">Securely access your medical portal.</p>
         </div>
 
-        {/* Error Notification */}
+        {/* Error Notification Banner */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2">
             <svg className="w-5 h-5 text-red-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -164,7 +174,7 @@ export default function Login() {
               >
                 {showPassword ? (
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                   </svg>
                 ) : (
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -215,6 +225,7 @@ export default function Login() {
         <div className="mt-6">
           <button 
             type="button"
+            onClick={handleGoogleSignIn}
             className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-colors"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -236,7 +247,7 @@ export default function Login() {
         </p>
       </div>
 
-      {/* Optional Footer Text mimicking your screenshot */}
+      {/* Footer Branding Text */}
       <div className="relative z-10 pb-6 text-xs text-teal-800/60 font-medium">
         © 2026 HealSync. Compassionate care, delivered digitally.
       </div>

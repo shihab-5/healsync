@@ -11,13 +11,14 @@ import { authClient } from "@/lib/auth-client";
 
 export default function Register() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     photoType: "upload", // 'upload' or 'url'
     photoFile: null,
     photoUrl: "",
+    role: "patient", // default starting role selection
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -72,11 +73,12 @@ export default function Register() {
       }
 
       // Execute better-auth client signup
-      const { data: res, error } = await authClient.signUp.email({
+    const { data: res, error } = await authClient.signUp.email({
         email: formData.email,
         password: formData.password,
         name: formData.name,
         image: imagePayload,
+        role: formData.role, // Pass the role straight to better-auth
         callbackURL: "/",
       });
 
@@ -87,6 +89,7 @@ export default function Register() {
       toast.success("Account created successfully! Redirecting...");
       
       // Reset form controls
+ // Reset form controls
       setFormData({
         name: "",
         email: "",
@@ -94,6 +97,7 @@ export default function Register() {
         photoType: "upload",
         photoFile: null,
         photoUrl: "",
+        role: "patient", 
       });
 
       // Navigate straight to homepage or dashboard workspace
@@ -106,7 +110,7 @@ export default function Register() {
     }
   };
 
-  return (
+return (
     <div className="relative min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans overflow-hidden">
       
       {/* Background Layer */}
@@ -124,9 +128,9 @@ export default function Register() {
       {/* Main Registration Card */}
       <div className="relative z-10 max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-gray-100 mt-8 mb-8">
         
-        {/* Header & Logo */}
-        <div className="flex flex-col items-start">
-          <div className="flex items-center gap-3 cursor-pointer group select-none mb-8">
+        {/* Header, Logo & Role Toggle */}
+        <div className="flex flex-col items-start w-full">
+          <div className="flex items-center gap-3 cursor-pointer group select-none mb-6">
             <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-teal-700 via-teal-600 to-teal-400 shadow-sm transition-all duration-500">
               <span className="text-white flex items-center justify-center">
                 <HeartFill size={14} />
@@ -144,10 +148,37 @@ export default function Register() {
             </div>
           </div>
 
+          {/* Role Selection Tabs */}
+          <div className="w-full flex bg-gray-100 rounded-xl p-1 mb-6">
+            <button
+              type="button"
+              onClick={() => setFormData((prev) => ({ ...prev, role: "patient" }))}
+              className={`flex-1 text-center py-2 text-sm font-semibold rounded-lg transition-all ${
+                formData.role === "patient"
+                  ? "bg-white text-teal-700 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Sign up as Patient
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormData((prev) => ({ ...prev, role: "doctor" }))}
+              className={`flex-1 text-center py-2 text-sm font-semibold rounded-lg transition-all ${
+                formData.role === "doctor"
+                  ? "bg-white text-teal-700 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Sign up as Doctor
+            </button>
+          </div>
+
           <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">Create Account</h2>
-          <p className="text-gray-500 text-sm">Join HealSync as a patient</p>
+          <p className="text-gray-500 text-sm capitalize">Join HealSync as a {formData.role}</p>
         </div>
 
+        {/* Registration Form */}
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
           
           {/* Full Name */}
