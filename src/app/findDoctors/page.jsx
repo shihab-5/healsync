@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 // Hardcoded categories list from your layout design
 const CATEGORIES = [
@@ -275,9 +276,9 @@ const FindDoctors = () => {
                                                 <span className="text-gray-400 text-xs font-bold tracking-wider uppercase ml-1">/ visit</span>
                                             </div>
                                             
-                                            <button className="bg-teal-700 hover:bg-teal-600 active:scale-95 text-white font-bold text-sm px-5 py-3 rounded-xl transition-all shadow-sm shadow-teal-700/5">
+                                            <Link href={`/findDoctors/${doctor._id}`} className="bg-teal-700 hover:bg-teal-600 active:scale-95 text-white font-bold text-sm px-5 py-3 rounded-xl transition-all shadow-sm shadow-teal-700/5">
                                                 Book Now
-                                            </button>
+                                            </Link>
                                         </div>
                                     </div>
                                 </motion.div>

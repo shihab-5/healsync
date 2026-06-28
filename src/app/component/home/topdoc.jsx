@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 async function getDoctors() {
   try {
@@ -128,9 +129,13 @@ const TopDoc = async () => {
 
             {/* Pagination Controls / View Link */}
             <div className="flex justify-center mt-12">
+                <Link href="/findDoctors"
+                >
                 <button className="px-6 py-3 border border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-900 font-bold text-sm rounded-xl bg-white shadow-sm transition-all active:scale-98">
                     View All Doctors
                 </button>
+                </Link>
+                
             </div>
         </section>
     );
