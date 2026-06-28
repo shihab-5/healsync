@@ -26,7 +26,7 @@ export default function Navbar() {
   const baseNavLinks = [
     { name: "Home", href: "/" },
     { name: "Find Doctors", href: "/findDoctors" },
-    { name: "About Us", href: "/about" },
+    { name: "About Us", href: "/aboutUs" },
     { name: "Contact Us", href: "/contact" },
   ];
 
