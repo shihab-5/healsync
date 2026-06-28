@@ -40,7 +40,7 @@ export function Sidebar() {
     doctor  :doctorNav
    }
    const navigationItems =navMap[user?.role||'patient']
-
+console.log(user)
 
   const accountItems = [
     { icon: Gear, label: "Profile Settings" },
