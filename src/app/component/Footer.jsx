@@ -1,8 +1,15 @@
+'use client';
 import { Link, Button } from "@heroui/react";
 import { HeartFill } from "@gravity-ui/icons";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+
+  const pathname=usePathname();
+  if (pathname.includes("/dashboard")) {
+    return null; // Don't render the footer on dashboard pages
+  }
 
   return (
     <footer className="bg-white border-t border-gray-100 border-l-[8px] border-l-teal-600 pt-16 pb-8 overflow-hidden">
