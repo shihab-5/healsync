@@ -55,6 +55,7 @@ const DetailsCard = ({ value }) => {
                     slot: selectedSlot,
                     symptoms: symptoms,
                     userEmail: user?.email,
+                    userId: user?._id,
                 }),
             });
 

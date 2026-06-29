@@ -1,3 +1,4 @@
+import { getUserSession } from '@/app/lib/session';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
@@ -7,7 +8,7 @@ export async function POST(request) {
     try {
         // ✅ FIX: Use request.json() instead of request.formData()
         const body = await request.json();
-        const { doctorId, doctorName, consultationFee, day, slot, symptoms, userEmail } = body;
+        const { doctorId, doctorName, consultationFee, day, slot, symptoms, userEmail, userId } = body;
 
         const origin = request.headers.get('origin') || 'http://localhost:3000';
 
@@ -37,8 +38,10 @@ export async function POST(request) {
                 day,
                 slot,
                 symptoms,
-                userEmail
-            },
+                userEmail,
+                userId ,
+                consultationFee,
+              },
             success_url: `${origin}/findDoctors/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${origin}/findDoctors/${doctorId}`,
         });
