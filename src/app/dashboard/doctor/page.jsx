@@ -4,7 +4,7 @@ import { Card, Chip, Separator, Avatar, Spinner } from '@heroui/react';
 import { PersonFill, Calendar, StarFill } from '@gravity-ui/icons';
 import { toast, Toaster } from 'react-hot-toast';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:5000';
 
 export default function DoctorDashboard() {
   const [stats, setStats] = useState({ patients: 0, todayAppointments: 0, reviews: 0 });
@@ -177,7 +177,7 @@ export default function DoctorDashboard() {
                       </div>
                       <div className="flex gap-0.5">
                         {Array.from({ length: 5 }).map((_, idx) => (
-                          <StarIcon
+                          <StarFill
                             key={idx}
                             width={14}
                             height={14}
