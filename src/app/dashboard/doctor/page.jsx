@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Card, Chip, Separator, Avatar, Spinner } from '@heroui/react';
-import { PersonFill, Calendar, Sta } from '@gravity-ui/icons';
+import { PersonFill, Calendar, StarFill } from '@gravity-ui/icons';
 import { toast, Toaster } from 'react-hot-toast';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -66,7 +66,7 @@ export default function DoctorDashboard() {
     {
       label: 'Reviews Received',
       value: stats.reviews,
-      icon: <Sta width={24} height={24} />,
+      icon: <StarFill width={24} height={24} />,
       color: 'bg-amber-50 text-amber-600',
       border: 'border-l-4 border-amber-500',
     },

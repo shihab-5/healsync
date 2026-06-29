@@ -499,7 +499,7 @@ const handleSubmit = async (e) => {
         {/* Footer Login Link */}
         <p className="mt-8 text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <Link href="/login" className="font-bold text-teal-600 hover:text-teal-500 hover:underline">
+          <Link href="auth/login" className="font-bold text-teal-600 hover:text-teal-500 hover:underline">
             Sign in
           </Link>
         </p>

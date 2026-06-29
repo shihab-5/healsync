@@ -23,7 +23,7 @@ const DetailsCard = ({ value }) => {
         return (
             <div className="min-h-[400px] flex flex-col items-center justify-center gap-4 text-center">
                 <p className="font-bold text-gray-700 text-lg">Please log in to continue.</p>
-                <Link href="/login" className="px-5 py-2.5 bg-teal-700 text-white font-bold text-sm rounded-xl hover:bg-teal-600 transition-all">
+                <Link href="auth/login" className="px-5 py-2.5 bg-teal-700 text-white font-bold text-sm rounded-xl hover:bg-teal-600 transition-all">
                     Go to Login
                 </Link>
             </div>
