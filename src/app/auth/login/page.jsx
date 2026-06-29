@@ -241,7 +241,7 @@ export default function Login() {
         {/* Footer Register Link */}
         <p className="mt-8 text-center text-sm text-gray-600">
           Don't have an account?{" "}
-          <Link href="/register" className="font-bold text-teal-600 hover:text-teal-500 hover:underline">
+          <Link href="/auth/register" className="font-bold text-teal-600 hover:text-teal-500 hover:underline">
             Register now
           </Link>
         </p>

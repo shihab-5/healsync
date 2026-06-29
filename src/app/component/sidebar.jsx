@@ -10,6 +10,10 @@ import {
   Star, 
   Gear, 
   ArrowRightFromSquare,
+  PersonSpeaker,
+  PersonMagnifier,
+  HouseFill,
+  ChartBar,
 } from "@gravity-ui/icons";
 import { Button, Drawer, Avatar } from "@heroui/react";
 import { authClient } from "@/lib/auth-client"; 
@@ -35,9 +39,43 @@ export function Sidebar() {
     { icon: Star, href:"/dashboard/doctor/prescriptions",label: "Prescriptions" },
   ];
 
+  const adminNav = [
+  { 
+    icon: LayoutColumns, 
+    href: "/dashboard/admin", 
+    label: "Overview" 
+  },
+  { 
+    icon: PersonSpeaker, 
+    href: "/dashboard/admin/manageUsers", 
+    label: "Manage Users" 
+  },
+  { 
+    icon: PersonMagnifier, 
+    href: "/dashboard/admin/manageDoctors", 
+    label: "Manage Doctors" 
+  },
+  { 
+    icon: Calendar, 
+    href: "/dashboard/admin/manageAppointments", 
+    label: "Appointments" 
+  },
+  { 
+    icon: CreditCard, 
+    href: "/dashboard/admin/payments", 
+    label: "Payments" 
+  },
+  { 
+    icon:ChartBar, // or ChartColumn / BarChart
+    href: "/dashboard/admin/analytics", 
+    label: "Analytics" 
+  },
+];
+
    const navMap= {
     patient :patientNav,
-    doctor  :doctorNav
+    doctor  :doctorNav,
+    admin   :adminNav
    }
    const navigationItems =navMap[user?.role||'patient']
 console.log(user)
@@ -49,7 +87,7 @@ console.log(user)
 
   const handleLogout = async () => {
     await authClient.signOut({
-      callbackURL: "/login",
+      callbackURL: "auth/login",
     });
   };
 
