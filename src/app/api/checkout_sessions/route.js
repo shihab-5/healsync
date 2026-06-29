@@ -32,16 +32,16 @@ export async function POST(request) {
                 },
             ],
             // Pass appointment details into metadata for your webhooks or database update
-            metadata: {
-                doctorId,
-                doctorName,
-                day,
-                slot,
-                symptoms,
-                userEmail,
-                userId ,
-                consultationFee,
-              },
+          metadata: {
+    doctorId: String(doctorId || ''),
+    doctorName: String(doctorName || ''),
+    day: String(day || ''),
+    slot: String(slot || ''),
+    symptoms: String(symptoms || ''),
+    userEmail: String(userEmail || ''),
+    userId: String(userId || ''),
+    consultationFee: String(consultationFee || 0),
+},
             success_url: `${origin}/findDoctors/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${origin}/findDoctors/${doctorId}`,
         });

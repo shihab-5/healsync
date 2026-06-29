@@ -13,18 +13,21 @@ export default async function Success({ searchParams }) {
   const {
     status,
     metadata,
+    payment_intent, 
     customer_details: { email: customerEmail }
   } = await stripe.checkout.sessions.retrieve(session_id, {
     expand: ['line_items', 'payment_intent']
   })
+  console.log('Payment Intent:', payment_intent)
+  console.log('Stripe Checkout Session:', { status, metadata })
 
   if (status === 'open') {
     return redirect('/')
   }
 
   if (status === 'complete') {
-    await bookAppointments({...metadata, sessionId: session_id})
-    return (
+    await bookAppointments({...metadata, sessionId: session_id,transactionId: payment_intent.id,status: 'confirmed'})
+    return ( 
       <section id="success">
            <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
             <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-gray-100 text-center shadow-sm">

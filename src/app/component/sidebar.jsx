@@ -25,8 +25,8 @@ export function Sidebar() {
   const patientNav = [
     { icon: LayoutColumns,href:"/dashboard/patient", label: "Overview" },
     { icon: Calendar,href:"/dashboard/patient/myAppointments", label: "My Appointments" },
-    { icon: CreditCard,href:"/dashboard/patient", label: "Payment History" },
-    { icon: Star, href:"/dashboard/patient",label: "My Reviews" },
+    { icon: CreditCard,href:"/dashboard/patient/paymentHistory", label: "Payment History" },
+    { icon: Star, href:"/dashboard/patient/myreview",label: "My Reviews" },
   ];
   const doctorNav = [
     { icon: LayoutColumns,href:"/dashboard/doctor", label: "Overview" },
@@ -43,7 +43,7 @@ export function Sidebar() {
 console.log(user)
 
   const accountItems = [
-    { icon: Gear, label: "Profile Settings" },
+    { icon: Gear,href:"/dashboard/patient/profile", label: "Profile Settings" },
     { icon: ArrowRightFromSquare, label: "Logout", isLogout: true },
   ];
 

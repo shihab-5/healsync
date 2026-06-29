@@ -8,6 +8,7 @@ import Link from 'next/link';
 const DetailsCard = ({ value }) => {
     const { data: session, isPending } = authClient.useSession();
     const user = session?.user;
+    console.log("Current user session:", user);
     
     // Interactive states for booking selection layout
     const [selectedDay, setSelectedDay] = useState(value.availableDays?.[0] || '');
@@ -55,7 +56,7 @@ const DetailsCard = ({ value }) => {
                     slot: selectedSlot,
                     symptoms: symptoms,
                     userEmail: user?.email,
-                    userId: user?._id,
+                    userId: user?.id,
                 }),
             });
 
