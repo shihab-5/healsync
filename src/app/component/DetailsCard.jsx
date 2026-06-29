@@ -2,10 +2,11 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
-import Link from 'next/link';
 
 const DetailsCard = ({ value }) => {
+    const router = useRouter();
     const { data: session, isPending } = authClient.useSession();
     const user = session?.user;
     console.log("Current user session:", user);
@@ -23,9 +24,13 @@ const DetailsCard = ({ value }) => {
         return (
             <div className="min-h-[400px] flex flex-col items-center justify-center gap-4 text-center">
                 <p className="font-bold text-gray-700 text-lg">Please log in to continue.</p>
-                <Link href="auth/login" className="px-5 py-2.5 bg-teal-700 text-white font-bold text-sm rounded-xl hover:bg-teal-600 transition-all">
+                <button
+                    type="button"
+                    onClick={() => router.push('/auth/login')}
+                    className="px-5 py-2.5 bg-teal-700 text-white font-bold text-sm rounded-xl hover:bg-teal-600 transition-all"
+                >
                     Go to Login
-                </Link>
+                </button>
             </div>
         );
     }

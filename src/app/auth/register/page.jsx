@@ -118,7 +118,7 @@ const handleSubmit = async (e) => {
 
     // 2. If the user is a Doctor, sync their professional details to the Express backend
     if (formData.role === "doctor") {
-      const docResponse = await fetch("http://localhost:5000/api/doctors", {
+      const docResponse = await fetch("process.env.NEXT_PUBLIC_SERVER_URL/api/doctors", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -499,7 +499,7 @@ const handleSubmit = async (e) => {
         {/* Footer Login Link */}
         <p className="mt-8 text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <Link href="auth/login" className="font-bold text-teal-600 hover:text-teal-500 hover:underline">
+          <Link href="/auth/login" className="font-bold text-teal-600 hover:text-teal-500 hover:underline">
             Sign in
           </Link>
         </p>

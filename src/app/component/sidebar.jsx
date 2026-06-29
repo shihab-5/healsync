@@ -87,7 +87,7 @@ console.log(user)
 
   const handleLogout = async () => {
     await authClient.signOut({
-      callbackURL: "auth/login",
+      callbackURL: "/auth/login",
     });
   };
 

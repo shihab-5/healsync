@@ -59,7 +59,7 @@ Create a `.env.local` file at the root of your project:
 
 ```env
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_SERVER_URL=http://localhost:5000
+NEXT_PUBLIC_SERVER_URL=process.env.NEXT_PUBLIC_SERVER_URL
 
 # Better Auth Configuration
 NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000

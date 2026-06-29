@@ -4,7 +4,7 @@ import { Card, Chip, Separator, Avatar, Spinner } from '@heroui/react';
 import { PersonFill, Calendar, StarFill } from '@gravity-ui/icons';
 import { toast, Toaster } from 'react-hot-toast';
 
-const API = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:5000';
+const API = process.env.NEXT_PUBLIC_SERVER_URL || 'process.env.NEXT_PUBLIC_SERVER_URL';
 
 export default function DoctorDashboard() {
   const [stats, setStats] = useState({ patients: 0, todayAppointments: 0, reviews: 0 });

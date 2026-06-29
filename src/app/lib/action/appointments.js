@@ -1,6 +1,6 @@
 'use server'
 
-const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:5000';
+const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'process.env.NEXT_PUBLIC_SERVER_URL';
 
 export const bookAppointments = async (data)=>{
     console.log('Booking appointment with data:', data); // Debugging line to check the data being sent

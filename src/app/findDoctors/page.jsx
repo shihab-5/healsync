@@ -25,7 +25,9 @@ const FindDoctors = () => {
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
-                const res = await fetch("http://localhost:5000/api/doctors");
+                const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/doctors`, {
+                    cache: "no-store" 
+                });
                 if (res.ok) {
                     const data = await res.json();
                     setDoctors(data);
