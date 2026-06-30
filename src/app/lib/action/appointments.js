@@ -24,3 +24,25 @@ export const payments = async (data)=>{
     });
      return res.json();
 }
+
+export async function getAppointments() {
+  const res = await fetch(`${baseUrl}/api/appointments`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Failed to fetch appointments");
+  return res.json();
+}
+ 
+/**
+ * Update an appointment's status (admin override).
+ * Mirrors updateDoctorProfile(id, payload) from app/lib/action/doctor.js
+ */
+export async function updateAppointmentStatus(appointmentId, payload) {
+  const res = await fetch(`${baseUrl}/api/appointments/${appointmentId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to update appointment");
+  return res.json();
+}
