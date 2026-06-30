@@ -1,10 +1,14 @@
+import { authClient } from "@/lib/auth-client";
 
 export const createDocUser = async (bookAppointment) => {
 
+  const {data:token}= await authClient.token();
+  console.log('Token retrieved:', token); // Debugging line to check the token
   const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/bookings`, {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
+      authorization: `Bearer ${token?.token}`,
     },
     body: JSON.stringify(bookAppointment)
   });

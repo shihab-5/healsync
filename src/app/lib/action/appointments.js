@@ -1,13 +1,25 @@
 'use server'
 
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+
 const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'process.env.NEXT_PUBLIC_SERVER_URL';
 
+const getToken = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+  return session?.session?.token;
+};
 export const bookAppointments = async (data)=>{
+  const token = await getToken();
+  console.log('Token retrieved:', token); // Debugging line to check the token
     console.log('Booking appointment with data:', data); // Debugging line to check the data being sent
     const res=await fetch(`${baseUrl}/api/appointments`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
+            authorization: `Bearer ${token}`
         },
         body: JSON.stringify(data),
     });

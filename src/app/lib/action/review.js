@@ -8,10 +8,15 @@ export const getReviews = async () => {
 };
 
 export const addReview = async (payload) => {
+  // const {data:token} = await authClient.token();
+  // console.log('Token retrieved:', token); // Debugging line to check the token
   // payload: { patientId, doctorId, doctorName, rating, reviewText }
   const res = await fetch(`${BASE_URL}/api/reviews`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      // authorization: `Bearer ${token?.token}`
+    },
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error("Failed to add review");
