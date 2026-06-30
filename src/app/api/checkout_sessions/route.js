@@ -10,7 +10,7 @@ export async function POST(request) {
         const body = await request.json();
         const { doctorId, doctorName, consultationFee, day, slot, symptoms, userEmail, userId } = body;
 
-        const origin = request.headers.get('origin') || 'http://localhost:3000';
+        const origin = request.headers.get('origin');
 
         // Create the Stripe Checkout Session
         const session = await stripe.checkout.sessions.create({
