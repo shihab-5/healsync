@@ -4,13 +4,25 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Card, Chip } from "@heroui/react";
 import { CreditCard, ArrowDownLeft } from "@gravity-ui/icons";
 import { authClient } from "@/lib/auth-client";
-import { getAppointments } from "@/app/lib/data";
+import { getPayments, getDoctors } from "@/app/lib/data";
+
+const formatDate = (dateValue) => {
+  if (!dateValue) return "—";
+  const date = new Date(dateValue?.$date || dateValue);
+  if (isNaN(date.getTime())) return "—";
+  return date.toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
 
 const PaymentHistory = () => {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
-  const [appointments, setAppointments] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [doctorMap, setDoctorMap] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,12 +30,24 @@ const PaymentHistory = () => {
 
     const fetchData = async () => {
       try {
-        const all = await getAppointments();
-        // Only paid appointments belong in payment history
-        const mine = (all || []).filter(
-          (a) => a.userId === user.id && a.sessionId
+        const [allPayments, allDoctors] = await Promise.all([
+          getPayments(),
+          getDoctors(),
+        ]);
+
+        // Only this patient's payments belong in payment history.
+        const mine = (allPayments || []).filter(
+          (p) => p.userId === user.id
         );
-        setAppointments(mine);
+        setPayments(mine);
+
+        // doctorId -> doctorName lookup, since payments only store the id.
+        const map = {};
+        (allDoctors || []).forEach((doc) => {
+          const id = doc._id?.$oid || doc._id;
+          map[id] = doc.doctorName;
+        });
+        setDoctorMap(map);
       } catch (err) {
         console.error("Failed to load payment history:", err);
       } finally {
@@ -35,9 +59,8 @@ const PaymentHistory = () => {
   }, [user?.id]);
 
   const totalPaid = useMemo(
-    () =>
-      appointments.reduce((sum, a) => sum + Number(a.consultationFee || 0), 0),
-    [appointments]
+    () => payments.reduce((sum, p) => sum + Number(p.consultationFee || 0), 0),
+    [payments]
   );
 
   if (isPending || loading) {
@@ -75,8 +98,8 @@ const PaymentHistory = () => {
               ${totalPaid}
             </span>
             <span className="text-xs font-bold text-slate-500">
-              Total paid &middot; {appointments.length} transaction
-              {appointments.length !== 1 ? "s" : ""}
+              Total paid &middot; {payments.length} transaction
+              {payments.length !== 1 ? "s" : ""}
             </span>
           </div>
         </Card>
@@ -89,7 +112,7 @@ const PaymentHistory = () => {
           <h2>Transaction Records</h2>
         </div>
 
-        {appointments.length === 0 ? (
+        {payments.length === 0 ? (
           <div className="py-12 text-center">
             <div className="w-14 h-14 rounded-2xl bg-slate-50 text-slate-300 flex items-center justify-center mx-auto mb-3">
               <CreditCard size={22} />
@@ -109,82 +132,88 @@ const PaymentHistory = () => {
                 <thead>
                   <tr className="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
                     <th className="py-3 pr-4">Doctor</th>
-                    <th className="py-3 pr-4">Appointment</th>
+                    <th className="py-3 pr-4">Date Paid</th>
                     <th className="py-3 pr-4">Transaction ID</th>
                     <th className="py-3 pr-4">Status</th>
                     <th className="py-3 text-right">Amount</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {appointments.map((pay) => (
-                    <tr
-                      key={pay._id}
-                      className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors"
-                    >
-                      <td className="py-3.5 pr-4">
-                        <span className="text-sm font-bold text-slate-800">
-                          Dr. {pay.doctorName}
-                        </span>
-                      </td>
-                      <td className="py-3.5 pr-4">
-                        <span className="text-xs font-semibold text-slate-500">
-                          {pay.day} &middot; {pay.slot}
-                        </span>
-                      </td>
-                      <td className="py-3.5 pr-4">
-                        <span className="text-xs font-mono font-medium text-slate-400">
-                          {pay.sessionId?.slice(0, 18)}...
-                        </span>
-                      </td>
-                      <td className="py-3.5 pr-4">
-                        <Chip
-                          size="sm"
-                          variant="flat"
-                          color="success"
-                          className="capitalize font-bold text-xs px-3"
-                        >
-                          paid
-                        </Chip>
-                      </td>
-                      <td className="py-3.5 text-right">
-                        <span className="text-sm font-extrabold text-emerald-600">
-                          ${pay.consultationFee}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {payments.map((pay) => {
+                    const id = pay._id?.$oid || pay._id;
+                    const doctorName = doctorMap[pay.doctorId] || "Unknown";
+                    return (
+                      <tr
+                        key={id}
+                        className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors"
+                      >
+                        <td className="py-3.5 pr-4">
+                          <span className="text-sm font-bold text-slate-800">
+                            Dr. {doctorName}
+                          </span>
+                        </td>
+                        <td className="py-3.5 pr-4">
+                          <span className="text-xs font-semibold text-slate-500">
+                            {formatDate(pay.paidAt)}
+                          </span>
+                        </td>
+                        <td className="py-3.5 pr-4">
+                          <span className="text-xs font-mono font-medium text-slate-400">
+                            {pay.transactionId?.slice(0, 18)}...
+                          </span>
+                        </td>
+                        <td className="py-3.5 pr-4">
+                          <Chip
+                            size="sm"
+                            variant="flat"
+                            color="success"
+                            className="capitalize font-bold text-xs px-3"
+                          >
+                            paid
+                          </Chip>
+                        </td>
+                        <td className="py-3.5 text-right">
+                          <span className="text-sm font-extrabold text-emerald-600">
+                            ${pay.consultationFee}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
 
             {/* Mobile cards */}
             <div className="md:hidden flex flex-col gap-3">
-              {appointments.map((pay) => (
-                <div
-                  key={pay._id}
-                  className="p-4 rounded-xl border border-slate-100 bg-slate-50/40"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-bold text-slate-800">
-                      Dr. {pay.doctorName}
-                    </span>
-                    <span className="flex items-center gap-1 text-sm font-extrabold text-emerald-600">
-                      <ArrowDownLeft size={14} />${pay.consultationFee}
-                    </span>
+              {payments.map((pay) => {
+                const id = pay._id?.$oid || pay._id;
+                const doctorName = doctorMap[pay.doctorId] || "Unknown";
+                return (
+                  <div
+                    key={id}
+                    className="p-4 rounded-xl border border-slate-100 bg-slate-50/40"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-bold text-slate-800">
+                        Dr. {doctorName}
+                      </span>
+                      <span className="flex items-center gap-1 text-sm font-extrabold text-emerald-600">
+                        <ArrowDownLeft size={14} />${pay.consultationFee}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                      <span>{formatDate(pay.paidAt)}</span>
+                      <Chip size="sm" variant="flat" color="success" className="font-bold">
+                        paid
+                      </Chip>
+                    </div>
+                    <div className="text-[11px] font-mono text-slate-400 mt-2 truncate">
+                      {pay.transactionId}
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-                    <span>
-                      {pay.day} &middot; {pay.slot}
-                    </span>
-                    <Chip size="sm" variant="flat" color="success" className="font-bold">
-                      paid
-                    </Chip>
-                  </div>
-                  <div className="text-[11px] font-mono text-slate-400 mt-2 truncate">
-                    {pay.sessionId}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )}

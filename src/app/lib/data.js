@@ -8,8 +8,21 @@ export const getUsers=async()=>{
     const data = await res.json();
     return data;
 }
+
+
 export const getAppointments=async()=>{
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/appointments`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/appointments`, {
+        cache: 'no-store',
+        next: { revalidate: 0 },
+    });
+    const data = await res.json();
+    return data;
+}
+export const getPayments=async()=>{
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/payments`, {
+        cache: 'no-store',
+        next: { revalidate: 0 },
+    });
     const data = await res.json();
     return data;
 }

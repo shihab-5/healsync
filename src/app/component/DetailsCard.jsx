@@ -9,14 +9,14 @@ const DetailsCard = ({ value }) => {
     const router = useRouter();
     const { data: session, isPending } = authClient.useSession();
     const user = session?.user;
-    console.log("Current user session:", user);
+    // console.log("Current user session:", user);
     
     // Interactive states for booking selection layout
     const [selectedDay, setSelectedDay] = useState(value.availableDays?.[0] || '');
     const [selectedSlot, setSelectedSlot] = useState(value.availableSlots?.[0] || '');
     const [symptoms, setSymptoms] = useState('');
     const [isProcessing, setIsProcessing] = useState(false); // ✅ Added checkout loading state
-
+    console.log("Current user session:", value);
     if (isPending) {
         return <div className="min-h-[400px] flex items-center justify-center font-medium text-gray-500">Loading your profile...</div>;
     }
@@ -48,7 +48,7 @@ const DetailsCard = ({ value }) => {
         setIsProcessing(true);
 
         try {
-            const response = await fetch('/api/checkout_sessions', {
+            const response = await fetch(`/api/checkout_sessions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -59,9 +59,10 @@ const DetailsCard = ({ value }) => {
                     consultationFee: value.consultationFee,
                     day: selectedDay,
                     slot: selectedSlot,
-                    symptoms: symptoms,
+                    symptoms: symptoms,                 
                     userEmail: user?.email,
                     userId: user?.id,
+                    appointmentStatus: "pending", 
                 }),
             });
 

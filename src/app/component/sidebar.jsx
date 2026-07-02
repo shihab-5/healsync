@@ -24,7 +24,7 @@ export function Sidebar() {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
-  const [activeItem, setActiveItem] = useState("Payment History");
+  const [activeItem, setActiveItem] = useState("");
 
   const patientNav = [
     { icon: LayoutColumns,href:"/dashboard/patient", label: "Overview" },
@@ -78,7 +78,7 @@ export function Sidebar() {
     admin   :adminNav
    }
    const navigationItems =navMap[user?.role||'patient']
-console.log(user)
+// console.log(user)
 
   const accountItems = [
     { icon: Gear,href:"/dashboard/patient/profile", label: "Profile Settings" },

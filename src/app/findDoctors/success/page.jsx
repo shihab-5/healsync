@@ -26,7 +26,7 @@ export default async function Success({ searchParams }) {
   }
 
   if (status === 'complete') {
-    await bookAppointments({...metadata, sessionId: session_id,transactionId: payment_intent.id,status: 'confirmed'})
+    await bookAppointments({...metadata, sessionId: session_id,transactionId: payment_intent?.id,status: 'confirmed'})
     return ( 
       <section id="success">
            <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
