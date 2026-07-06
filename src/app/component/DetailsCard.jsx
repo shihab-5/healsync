@@ -54,7 +54,7 @@ const DetailsCard = ({ value }) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    doctorId: value._id,
+                    doctorId: value.userId,
                     doctorName: value.doctorName,
                     consultationFee: value.consultationFee,
                     day: selectedDay,

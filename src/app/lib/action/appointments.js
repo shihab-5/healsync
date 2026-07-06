@@ -122,7 +122,7 @@ export const payments = async (data) => {
     body: JSON.stringify(data),
   });
 
-  return parseJsonResponse(res);
+  return res.json();
 };
 
 export async function getAppointments() {
@@ -131,7 +131,8 @@ export async function getAppointments() {
   });
 
   if (!res.ok) throw new Error("Failed to fetch appointments");
-  return parseJsonResponse(res);
+
+  return res.json();
 }
 
 /**
