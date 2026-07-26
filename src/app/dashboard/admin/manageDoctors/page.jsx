@@ -59,12 +59,12 @@ export default function ManageDoctors() {
   }, [doctors, activeFilter, search]);
 
   const updateStatus = async (doctor, newStatus, successMsg) => {
-    setActingId(doctor._id);
+    setActingId(doctor.userId);
     try {
-      await updateDoctorProfile(doctor._id, { verificationStatus: newStatus });
+      await updateDoctorProfile(doctor.userId, { verificationStatus: newStatus });
       setDoctors((prev) =>
         prev.map((d) =>
-          d._id === doctor._id ? { ...d, verificationStatus: newStatus } : d
+          d.userId === doctor.userId ? { ...d, verificationStatus: newStatus } : d
         )
       );
       toast.success(successMsg);
@@ -164,11 +164,11 @@ export default function ManageDoctors() {
         <div className="flex flex-col gap-4">
           {filteredDoctors.map((doc) => {
             const status = statusOf(doc);
-            const isActing = actingId === doc._id;
+            const isActing = actingId === doc.userId;
 
             return (
               <Card
-                key={doc._id}
+                key={doc.userId}
                 className="border border-slate-100 bg-white rounded-2xl shadow-sm p-5"
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

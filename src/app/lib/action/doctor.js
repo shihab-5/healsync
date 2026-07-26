@@ -28,9 +28,15 @@ export const getDoctors = async () => {
   return res.json();
 };
  
+// export const getDoctorByUserId = async (userId) => {
+//   console.log('Fetching doctor info for userId:', userId); // Debugging line to check the userId
+//   const res = await fetch(`${BASE_URL}/api/doctors/${userId}`);
+//   // if (!res.ok) throw new Error("Failed to fetch doctor profile");
+//   return res.json();
+// };
+
 export const getDoctorByUserId = async (userId) => {
-  const res = await fetch(`${BASE_URL}/api/doctors/by-user/${userId}`);
-  if (!res.ok) throw new Error("Failed to fetch doctor profile");
+  const res = await fetch(`${BASE_URL}/api/doctors/user/${userId}`);
   return res.json();
 };
  
