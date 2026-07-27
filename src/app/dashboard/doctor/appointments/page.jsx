@@ -1,278 +1,300 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Button, Chip } from "@heroui/react";
 import {
   Check,
   Xmark,
-  CircleCheck,
-  Person,
-  Calendar,
-  Clock,
   FileText,
-  Pulse,
+  Funnel,
 } from "@gravity-ui/icons";
 import toast from "react-hot-toast";
-import { updateAppointmentStatus } from "@/app/lib/action/appointments";
+import { authClient } from "@/lib/auth-client";
+import { getAppointments } from "@/app/lib/data";
+import { getDoctors } from "@/app/lib/action/doctor";
+import { getUsers } from "@/app/lib/action/user";
 
 const STATUS_TABS = [
-  { key: "pending", label: "Pending Requests" },
-  { key: "accepted", label: "Upcoming / Accepted" },
+  { key: "all", label: "All" },
+  { key: "pending", label: "Pending" },
+  { key: "confirmed", label: "Confirmed" },
   { key: "completed", label: "Completed" },
   { key: "rejected", label: "Rejected" },
-  { key: "all", label: "All" },
 ];
 
-export default function AppointmentRequests({ initialAppointments = [] }) {
+export default function AppointmentRequests() {
   const router = useRouter();
-  const [appointments, setAppointments] = useState(initialAppointments);
-  const [selectedStatus, setSelectedStatus] = useState("pending");
-  const [loadingId, setLoadingId] = useState(null);
+  const { data: session, isPending: isSessionPending } = authClient.useSession();
+  const currentUser = session?.user;
 
-  // Filter appointments by selected status tab
-  const filteredAppointments = appointments.filter((app) => {
-    if (selectedStatus === "all") return true;
-    return (app.appointmentStatus || "pending").toLowerCase() === selectedStatus;
-  });
+  const [users, setUsers] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Handle Accept/Reject status updates
-  const handleStatusChange = async (appointmentId, newStatus) => {
-    setLoadingId(appointmentId);
-    try {
-      if (typeof updateAppointmentStatus === "function") {
-        await updateAppointmentStatus(appointmentId, newStatus);
+  const [selectedStatus, setSelectedStatus] = useState("all");
+
+  // Fetch initial data
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [u, d, a] = await Promise.all([
+          getUsers(),
+          getDoctors(),
+          getAppointments(),
+        ]);
+        setUsers(u || []);
+        setDoctors(d || []);
+        setAppointments(a || []);
+      } catch (err) {
+        console.error("Failed to load appointment data:", err);
+        toast.error("Failed to load appointments");
+      } finally {
+        setLoading(false);
       }
+    };
+    loadData();
+  }, []);
 
-      setAppointments((prev) =>
-        prev.map((app) =>
-          (app._id || app.id) === appointmentId
-            ? { ...app, appointmentStatus: newStatus }
-            : app
-        )
-      );
+  // Find current doctor profile matching the logged-in session user
+  const currentDoctor = useMemo(() => {
+    if (!currentUser) return null;
+    return doctors.find(
+      (d) =>
+        d.userId === currentUser.id ||
+        d.email?.toLowerCase() === currentUser.email?.toLowerCase() ||
+        d._id === currentUser.id
+    );
+  }, [doctors, currentUser]);
 
-      if (newStatus === "accepted") {
-        toast.success("Appointment request accepted!");
-      } else if (newStatus === "rejected") {
-        toast.error("Appointment request rejected.");
-      }
-    } catch (err) {
-      toast.error("Failed to update appointment status.");
-    } finally {
-      setLoadingId(null);
+  // Filter appointments for this specific doctor and enrich patient names from user data
+  const doctorAppointments = useMemo(() => {
+    if (!currentDoctor && !currentUser) return [];
+    const docId = currentDoctor?._id || currentDoctor?.id || currentUser?.id;
+
+    return appointments
+      .filter((app) => app.doctorId === docId)
+      .map((app) => {
+        const patient = users.find((u) => u.id === app.userId || u._id === app.userId);
+        return {
+          ...app,
+          patientName:
+            app.userName ||
+            patient?.name ||
+            app.userEmail?.split("@")[0] ||
+            "Patient",
+        };
+      });
+  }, [appointments, currentDoctor, currentUser, users]);
+
+  // Filter list based on selected status tab
+  const filteredAppointments = useMemo(() => {
+    return doctorAppointments.filter((app) => {
+      if (selectedStatus === "all") return true;
+      const status = (app.appointmentStatus || "pending").toLowerCase();
+      // Map 'accepted' to 'confirmed' for consistent status matching
+      const normalizedStatus = status === "accepted" ? "confirmed" : status;
+      return normalizedStatus === selectedStatus;
+    });
+  }, [doctorAppointments, selectedStatus]);
+
+  // Local static status updates (Accept / Reject)
+  const handleStatusChange = (appointmentId, newStatus) => {
+    setAppointments((prev) =>
+      prev.map((app) =>
+        (app._id || app.id) === appointmentId
+          ? { ...app, appointmentStatus: newStatus }
+          : app
+      )
+    );
+
+    if (newStatus === "confirmed" || newStatus === "accepted") {
+      toast.success("Appointment request accepted!");
+    } else if (newStatus === "rejected") {
+      toast.error("Appointment request rejected.");
     }
   };
 
-  // Mark Completed & Redirect to Prescription Page
-  const handleMarkCompleted = async (appointment) => {
+  // Local Mark Completed & Navigation to Prescription Page
+  const handleMarkCompleted = (appointment) => {
     const id = appointment._id || appointment.id;
-    setLoadingId(id);
 
-    try {
-      if (typeof updateAppointmentStatus === "function") {
-        await updateAppointmentStatus(id, "completed");
-      }
+    setAppointments((prev) =>
+      prev.map((app) =>
+        (app._id || app.id) === id
+          ? { ...app, appointmentStatus: "completed" }
+          : app
+      )
+    );
 
-      setAppointments((prev) =>
-        prev.map((app) =>
-          (app._id || app.id) === id
-            ? { ...app, appointmentStatus: "completed" }
-            : app
-        )
-      );
+    toast.success("Marked as Completed!");
 
-      toast.success("Marked as Completed! Redirecting to prescription...");
+    const patientId = appointment.userId || appointment.patientId || "";
+    const queryParams = new URLSearchParams({
+      appointmentId: id,
+      patientId,
+      patientName: appointment.patientName || appointment.userEmail || "",
+    }).toString();
 
-      const patientId = appointment.userId || appointment.patientId || "";
-      const queryParams = new URLSearchParams({
-        appointmentId: id,
-        patientId,
-        patientName: appointment.userName || appointment.userEmail || "",
-      }).toString();
-
-      router.push(`/dashboard/doctor/prescription?${queryParams}`);
-    } catch (err) {
-      toast.error("Failed to mark appointment as completed.");
-      setLoadingId(null);
-    }
+    router.push(`/dashboard/doctor/prescription?${queryParams}`);
   };
 
-  const getStatusBadgeColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "accepted":
-        return "success";
-      case "rejected":
-        return "danger";
-      case "completed":
-        return "secondary";
-      default:
-        return "warning";
-    }
-  };
+  if (isSessionPending || loading) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center bg-slate-50/60">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <span className="text-sm font-semibold text-slate-500">Loading requests...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full min-h-screen bg-slate-50/60 p-4 md:p-8 font-sans">
+    <div className="w-full min-h-screen bg-[#F4F6F8] p-4 md:p-8 font-sans">
       {/* Header */}
-      <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-800 flex items-center gap-2">
-            <Pulse className="text-teal-600" size={26} /> Appointment Requests
-          </h1>
-          <p className="text-sm text-slate-500 font-medium mt-1">
-            Review patient requests, manage schedule approvals, and generate prescriptions.
-          </p>
+      <div className="mb-6">
+        <h1 className="text-2xl md:text-3xl font-black text-[#1E293B] tracking-tight">
+          Appointment Requests
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">
+          Review and manage patient appointment requests
+        </p>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex items-center gap-3 mb-6 overflow-x-auto pb-2">
+        <Funnel size={18} className="text-slate-400 shrink-0" />
+        <div className="flex items-center gap-2">
+          {STATUS_TABS.map((tab) => {
+            const isActive = selectedStatus === tab.key;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setSelectedStatus(tab.key)}
+                className={`px-5 py-2 rounded-full text-xs font-bold transition-all shadow-sm ${
+                  isActive
+                    ? "bg-[#2563EB] text-white"
+                    : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/60"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Status Filter Tabs (Button Group) */}
-      <div className="flex flex-wrap gap-2 mb-6 border-b border-slate-200 pb-4">
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setSelectedStatus(tab.key)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-              selectedStatus === tab.key
-                ? "bg-teal-700 text-white shadow-sm"
-                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Appointment Cards Grid */}
+      {/* Appointments List */}
       {filteredAppointments.length === 0 ? (
-        <Card className="border border-slate-100 bg-white rounded-2xl p-10 text-center shadow-sm">
-          <Calendar size={36} className="mx-auto text-slate-300 mb-3" />
-          <p className="text-base font-bold text-slate-600">No {selectedStatus} appointments found</p>
-          <p className="text-xs text-slate-400 mt-1">
-            New patient appointment requests will appear here.
+        <Card className="border border-slate-200/60 bg-white rounded-2xl p-10 text-center shadow-sm">
+          <p className="text-sm font-bold text-slate-500">
+            No {selectedStatus === "all" ? "" : selectedStatus} appointment requests found.
           </p>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="space-y-4">
           {filteredAppointments.map((app) => {
             const id = app._id || app.id;
-            const status = (app.appointmentStatus || "pending").toLowerCase();
-            const isLoading = loadingId === id;
+            const rawStatus = (app.appointmentStatus || "pending").toLowerCase();
+            const status = rawStatus === "accepted" ? "confirmed" : rawStatus;
+            const avatarInitial = app.patientName ? app.patientName.charAt(0).toUpperCase() : "P";
 
             return (
               <Card
                 key={id}
-                className="border border-slate-100 bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
+                className="border border-slate-200/60 bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow"
               >
-                {/* Patient Info Header */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center shrink-0">
-                        <Person size={16} />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-extrabold text-slate-800 truncate">
-                          {app.userName || app.userEmail?.split("@")[0] || "Patient"}
-                        </h3>
-                        <p className="text-[11px] text-slate-400 truncate">{app.userEmail}</p>
-                      </div>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  {/* Left: Patient Avatar & Details */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-[#EEF2FF] text-[#2563EB] font-black text-lg flex items-center justify-center shrink-0">
+                      {avatarInitial}
                     </div>
 
-                    <Chip
-                      size="sm"
-                      color={getStatusBadgeColor(status)}
-                      className="font-bold capitalize text-[10px]"
-                    >
-                      {status}
-                    </Chip>
-                  </div>
+                    <div className="space-y-1.5">
+                      <h3 className="text-base font-extrabold text-slate-800">
+                        {app.patientName}
+                      </h3>
+                      <p className="text-xs font-medium text-slate-400">
+                        {app.day || app.date || "2025-07-15"} at {app.slot || app.time || "10:00 AM"}
+                      </p>
 
-                  {/* Schedule Details */}
-                  <div className="bg-slate-50 rounded-xl p-3 text-xs space-y-1.5 font-medium text-slate-600 border border-slate-100">
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1.5 text-slate-500">
-                        <Calendar size={14} className="text-teal-600" /> Day:
-                      </span>
-                      <span className="font-bold text-slate-800">{app.day || "N/A"}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1.5 text-slate-500">
-                        <Clock size={14} className="text-teal-600" /> Time Slot:
-                      </span>
-                      <span className="font-mono font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded">
-                        {app.slot || app.time || "N/A"}
-                      </span>
+                      {/* Symptoms Badge */}
+                      {app.symptoms && (
+                        <div className="inline-block bg-slate-50 border border-slate-100 rounded-xl px-3 py-1.5 text-xs text-slate-600 font-medium mt-1">
+                          <span className="font-bold text-slate-400">Symptoms: </span>
+                          {app.symptoms}
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* Symptoms */}
-                  {app.symptoms && (
-                    <div className="text-xs text-slate-600 bg-amber-50/60 border border-amber-100 p-2.5 rounded-xl">
-                      <span className="font-bold text-amber-900 block mb-0.5">Symptoms:</span>
-                      <p className="line-clamp-2">{app.symptoms}</p>
-                    </div>
-                  )}
-                </div>
+                  {/* Right: Status Tag & Action Buttons */}
+                  <div className="flex items-center gap-2 self-start md:self-center">
+                    {/* Status Display Pill */}
+                    {status === "pending" && (
+                      <Chip size="sm" variant="flat" className="bg-amber-50 text-amber-600 font-bold px-3 py-1">
+                        Pending
+                      </Chip>
+                    )}
 
-                {/* Actions */}
-                <div className="pt-4 mt-4 border-t border-slate-100 flex flex-wrap items-center gap-2">
-                  {status === "pending" && (
-                    <>
+                    {(status === "confirmed" || status === "accepted") && (
+                      <Chip size="sm" variant="flat" className="bg-blue-50 text-blue-600 font-bold px-3 py-1">
+                        Confirmed
+                      </Chip>
+                    )}
+
+                    {status === "completed" && (
+                      <Chip size="sm" variant="flat" className="bg-emerald-50 text-emerald-600 font-bold px-3 py-1">
+                        Completed
+                      </Chip>
+                    )}
+
+                    {status === "rejected" && (
+                      <Chip size="sm" variant="flat" className="bg-rose-50 text-rose-600 font-bold px-3 py-1">
+                        Rejected
+                      </Chip>
+                    )}
+
+                    {/* Action Controls */}
+                    {status === "pending" && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="flat"
+                          onPress={() => handleStatusChange(id, "confirmed")}
+                          className="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 font-bold rounded-xl border border-emerald-200"
+                          startContent={<Check size={16} />}
+                        >
+                          Accept
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          variant="flat"
+                          onPress={() => handleStatusChange(id, "rejected")}
+                          className="bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-xl border border-rose-200"
+                          startContent={<Xmark size={16} />}
+                        >
+                          Reject
+                        </Button>
+                      </>
+                    )}
+
+                    {(status === "confirmed" || status === "accepted") && (
                       <Button
                         size="sm"
-                        color="success"
-                        isLoading={isLoading}
-                        onPress={() => handleStatusChange(id, "accepted")}
-                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl"
-                        startContent={!isLoading && <Check size={16} />}
-                      >
-                        Accept
-                      </Button>
-
-                      <Button
-                        size="sm"
-                        color="danger"
                         variant="flat"
-                        isLoading={isLoading}
-                        onPress={() => handleStatusChange(id, "rejected")}
-                        className="flex-1 font-bold rounded-xl"
-                        startContent={!isLoading && <Xmark size={16} />}
+                        onPress={() => handleMarkCompleted(app)}
+                        className="bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold rounded-xl border border-blue-200"
+                        startContent={<FileText size={16} />}
                       >
-                        Reject
+                        Mark Complete
                       </Button>
-                    </>
-                  )}
-
-                  {status === "accepted" && (
-                    <Button
-                      size="sm"
-                      isLoading={isLoading}
-                      onPress={() => handleMarkCompleted(app)}
-                      className="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-xl"
-                      startContent={!isLoading && <CircleCheck size={16} />}
-                    >
-                      Mark Completed & Create Prescription
-                    </Button>
-                  )}
-
-                  {status === "completed" && (
-                    <Button
-                      size="sm"
-                      variant="light"
-                      onPress={() =>
-                        router.push(
-                          `/dashboard/doctor/prescription?appointmentId=${id}&patientId=${
-                            app.userId || app.patientId || ""
-                          }`
-                        )
-                      }
-                      className="w-full text-teal-700 font-bold hover:bg-teal-50 rounded-xl"
-                      startContent={<FileText size={16} />}
-                    >
-                      View Prescription
-                    </Button>
-                  )}
+                    )}
+                  </div>
                 </div>
               </Card>
             );

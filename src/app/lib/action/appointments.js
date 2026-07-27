@@ -13,6 +13,7 @@ const getToken = async () => {
   return session?.session?.token;
 };
 export const bookAppointments = async (data)=>{
+  console.log('bookAppointments called with data:', data); // Debugging line to check the data being sent
   const token = await getToken();
   console.log('Token retrieved:', token); // Debugging line to check the token
     console.log('Booking appointment with data:', data); // Debugging line to check the data being sent

@@ -9,8 +9,8 @@ const DetailsCard = ({ value }) => {
     const router = useRouter();
     const { data: session, isPending } = authClient.useSession();
     const user = session?.user;
-    // console.log("Current user session:", user);
-    
+    console.log("Current user session:", user);
+    console.log("Doctor details:", value);
     // Interactive states for booking selection layout
     const [selectedDay, setSelectedDay] = useState(value.availableDays?.[0] || '');
     const [selectedSlot, setSelectedSlot] = useState(value.availableSlots?.[0] || '');

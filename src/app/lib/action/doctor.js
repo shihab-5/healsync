@@ -1,3 +1,7 @@
+
+// "use server";
+
+// import { revalidatePath } from "next/cache";
 import { authClient } from "@/lib/auth-client";
 
 export const createDocUser = async (bookAppointment) => {
@@ -51,3 +55,24 @@ export const updateDoctorProfile = async (doctorId, payload) => {
   return res.json();
 };
  
+
+
+
+/**
+ * Server action to update doctor profile details
+ */
+// export async function updateDoctorProfile(id, profileData) {
+//   try {
+//     // Replace this logic with your database model (MongoDB / Prisma / etc.)
+//     console.log("Updating Doctor ID:", id, "With Payload:", profileData);
+
+//     // Revalidate paths to update UI across dashboard
+//     revalidatePath("/dashboard/doctor/profile");
+//     revalidatePath("/dashboard/doctor");
+
+//     return { success: true, message: "Profile updated successfully!" };
+//   } catch (error) {
+//     console.error("Error updating doctor profile:", error);
+//     return { success: false, error: "Failed to update profile details" };
+//   }
+// }

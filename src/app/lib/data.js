@@ -28,6 +28,7 @@ export const getPayments=async()=>{
 }
 
 export const getDoctorDetails=async(id)=>{
+    console.log('Fetching doctor details for id:', id); // Debugging line to check the id being fetched
     
 //     const {token}=await auth.api.getToken({
 //         headers:await headers()
@@ -40,7 +41,9 @@ const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/doctors/${id}
         //       }
         //     }
     );
+    console.log('Response from server:', res); // Debugging line to check the response object
     const data = await res.json();
+    console.log('Fetched doctor details:', data); // Debugging line to check the fetched data
     return data;
     
 }
