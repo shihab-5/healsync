@@ -80,10 +80,16 @@ export function Sidebar() {
    const navigationItems =navMap[user?.role||'patient']
 // console.log(user)
 
-  const accountItems = [
-    { icon: Gear,href:"/dashboard/patient/profile", label: "Profile Settings" },
-    { icon: ArrowRightFromSquare, label: "Logout", isLogout: true },
-  ];
+const profileRouteMap = {
+  patient: "/dashboard/patient/profile",
+  doctor:  "/dashboard/doctor/profile",
+  admin:   "/dashboard/admin/profile",
+};
+
+const accountItems = [
+  { icon: Gear, href: profileRouteMap[user?.role || "patient"], label: "Profile Settings" },
+  { icon: ArrowRightFromSquare, label: "Logout", isLogout: true },
+];
 
   const handleLogout = async () => {
     await authClient.signOut({

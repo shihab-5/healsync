@@ -7,6 +7,7 @@ const client = new MongoClient(process.env.MONGODB_URI);
 const db = client.db("healsync");
 
 export const auth = betterAuth({
+    trustedOrigins: ['http://localhost:3000', 'https://healsync-three.vercel.app'],
       emailAndPassword: {    
         enabled: true
     } ,

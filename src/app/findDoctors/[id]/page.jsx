@@ -4,9 +4,9 @@ import React from 'react';
 
 const DoctorDetails = async ({params}) => {
     const { id } =await params;
-    console.log('DoctorDetails id:', id); // Debugging line to check the received id
+    // console.log('DoctorDetails id:', id); // Debugging line to check the received id
     const data=await getDoctorDetails(id);
-    console.log('DoctorDetails data:', data); // Debugging line to check the fetched data
+    // console.log('DoctorDetails data:', data); // Debugging line to check the fetched data
 
     if (!data) {
         return <div>
