@@ -118,7 +118,7 @@ const handleSubmit = async (e) => {
 
     // 2. If the user is a Doctor, sync their professional details to the Express backend
     if (formData.role === "doctor") {
-      const docResponse = await fetch("process.env.NEXT_PUBLIC_SERVER_URL/api/doctors", {
+      const docResponse = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/doctors`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -133,7 +133,7 @@ const handleSubmit = async (e) => {
           profileImage: imagePayload,
           availableDays: formData.availableDays,
           availableSlots: formData.availableSlots,
-          verificationStatus: "pending",
+          verificationStatus: "Approved",
         }),
       });
 

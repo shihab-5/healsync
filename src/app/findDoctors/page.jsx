@@ -241,7 +241,7 @@ const FindDoctors = () => {
                                                 </svg>
                                             )}
                                             <span className="capitalize tracking-wide">
-                                                {doctor.verificationStatus || "pending"}
+                                                {doctor.verificationStatus || "Approved"}
                                             </span>
                                         </div>
                                     </div>
