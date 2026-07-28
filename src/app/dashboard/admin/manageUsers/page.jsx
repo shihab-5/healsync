@@ -43,28 +43,32 @@ export default function ManageUsers() {
     });
   }, [users, roleFilter, search]);
 
-  const handleSuspendToggle = async (u) => {
-    const isSuspended = statusOf(u) === "suspended";
-    const newStatus = isSuspended ? "active" : "suspended";
+ const handleSuspendToggle = async (u) => {
+  const uid = u._id || u.id;
+  const isSuspended = statusOf(u) === "suspended";
+  const newStatus = isSuspended ? "active" : "suspended";
 
-    if (!isSuspended && !confirm(`Suspend ${u.name}? They won't be able to log in until reactivated.`)) {
-      return;
-    }
+  if (!isSuspended && !confirm(`Suspend ${u.name}? They won't be able to log in until reactivated.`)) {
+    return;
+  }
 
-    setActingId(u._id || u.id);
-    try {
-      await updateUserStatus(u._id || u.id, newStatus);
-      setUsers((prev) =>
-        prev.map((p) => (p._id === u._id || p.id === u.id ? { ...p, status: newStatus } : p))
-      );
-      toast.success(isSuspended ? `${u.name} reactivated.` : `${u.name} suspended.`);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to update user status.");
-    } finally {
-      setActingId(null);
-    }
-  };
+  setActingId(uid);
+  try {
+    await updateUserStatus(uid, newStatus);
+    setUsers((prev) =>
+      prev.map((p) => {
+        const pid = p._id || p.id;
+        return pid === uid ? { ...p, status: newStatus } : p;
+      })
+    );
+    toast.success(isSuspended ? `${u.name} reactivated.` : `${u.name} suspended.`);
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to update user status.");
+  } finally {
+    setActingId(null);
+  }
+};
 
   const handleDelete = async (u) => {
     if (!confirm(`Permanently delete ${u.name}? This can't be undone.`)) return;
