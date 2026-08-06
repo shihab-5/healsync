@@ -9,6 +9,7 @@ export const getUsers = async () => {
 };
 
 export const updateUserStatus = async (id, status) => {
+  console.log("Updating user status:", id, status);
   // status: "active" | "suspended"
   const res = await fetch(`${BASE_URL}/user/${id}`, {
     method: "PATCH",

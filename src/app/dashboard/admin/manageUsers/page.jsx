@@ -30,7 +30,7 @@ export default function ManageUsers() {
     load();
   }, []);
 
-  const statusOf = (u) => u.status || "active";
+  const statusOf = (u) => u.status || "Active";
 
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
@@ -44,6 +44,8 @@ export default function ManageUsers() {
   }, [users, roleFilter, search]);
 
  const handleSuspendToggle = async (u) => {
+  console.log("Toggling suspend for user:", u);
+  console.log("Current status:", statusOf(u));
   const uid = u._id || u.id;
   const isSuspended = statusOf(u) === "suspended";
   const newStatus = isSuspended ? "active" : "suspended";

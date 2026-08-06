@@ -22,10 +22,13 @@ async function getDoctors() {
 const TopDoc = async () => {
     const doctors = await getDoctors();
 
-    if (!doctors || doctors.length === 0) {
+    const topDoctors = doctors.filter((doctor) => doctor.experience > 0 && doctor.verificationStatus === "verified").slice(0, 4);
+
+
+    if (!topDoctors || topDoctors.length === 0) {
         return (
             <div className="text-center py-20 text-gray-400 font-medium">
-                No doctor registration records found in the database.
+                No featured doctors found.
             </div>
         );
     }
@@ -44,7 +47,7 @@ const TopDoc = async () => {
 
             {/* RESTORED: Maximum of 3 columns with gap-8 makes the cards big and clean again */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                {doctors.map((doctor) => {
+                {topDoctors.map((doctor) => {
                     const displayName = doctor.doctorName.startsWith("Dr.") 
                         ? doctor.doctorName 
                         : `Dr. ${doctor.doctorName}`;

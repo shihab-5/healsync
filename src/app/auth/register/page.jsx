@@ -108,6 +108,7 @@ const handleSubmit = async (e) => {
       name: formData.name,
       image: imagePayload,
       role: formData.role, 
+      status: "Active",
       callbackURL: "/",
       disableRedirect: true, // <-- Prevents the auth library from cutting off execution
     });
@@ -133,7 +134,7 @@ const handleSubmit = async (e) => {
           profileImage: imagePayload,
           availableDays: formData.availableDays,
           availableSlots: formData.availableSlots,
-          verificationStatus: "Approved",
+          verificationStatus: "pending", // Default status for new doctor registrations
         }),
       });
 

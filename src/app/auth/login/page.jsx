@@ -43,18 +43,22 @@ export default function Login() {
         password: formData.password,
         callbackURL: "/", // Destination upon successful processing
       });
-
-      if (authError) {
-        setError(authError.message || "Invalid email or password.");
-      } else {
-        toast.success("Login successful!", data);
-        router.push("/"); // Direct user to home page base
-      }
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
+  console.log("Login response:", { data});
+        if (authError) {
+    if (authError.message?.toLowerCase().includes("suspended")) {
+      setError("Your account has been suspended. Please contact support.");
+    } else {
+      setError(authError.message || "Invalid email or password.");
     }
+  } else {
+    toast.success("Login successful!");
+    router.push("/");
+  }
+} catch (err) {
+  setError("Something went wrong. Please try again.");
+} finally {
+  setIsLoading(false);
+}
   };
 
   const handleGoogleSignIn = async () => {
