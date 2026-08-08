@@ -63,6 +63,23 @@ export const deleteAppointment = async (appointmentId) => {
   };
 };
 
+export const updateAppointment =async (appointmentId, data) => {
+  console.log('updateAppointment called with appointmentId:', appointmentId, 'and data:', data); 
+  const res =await fetch(`${baseUrl}/api/appointments/${appointmentId}`,
+    {
+      method:"PATCH",
+      headers:{
+        "content-type":"application/json",
+      },
+      body:JSON.stringify(data),
+
+      });
+   data=await res.json();
+   return data;
+    }
+  
+
+
 export const updateAppointmentStatus = async (appointmentId, { day, slot, symptoms }) => {
   console.log('[appointments.js] updateAppointmentStatus start', { appointmentId, day, slot, symptoms });
   const token = await getToken();

@@ -14,6 +14,7 @@ import { authClient } from "@/lib/auth-client";
 import { getAppointments } from "@/app/lib/data";
 import { getDoctors } from "@/app/lib/action/doctor";
 import { getUsers } from "@/app/lib/action/user";
+import { updateAppointment } from "@/app/lib/action/appointments";
 
 const STATUS_TABS = [
   { key: "all", label: "All" },
@@ -67,12 +68,12 @@ export default function AppointmentRequests() {
         d._id === currentUser.id
     );
   }, [doctors, currentUser]);
-
+// console.log("Current Doctor Profile:", currentDoctor);
   // Filter appointments for this specific doctor and enrich patient names from user data
   const doctorAppointments = useMemo(() => {
     if (!currentDoctor && !currentUser) return [];
-    const docId = currentDoctor?._id || currentDoctor?.id || currentUser?.id;
-
+    const docId = currentDoctor?.userId || currentDoctor?.id || currentUser?.id;
+  // console.log("Current Doctor ID:", docId);
     return appointments
       .filter((app) => app.doctorId === docId)
       .map((app) => {
@@ -100,7 +101,9 @@ export default function AppointmentRequests() {
   }, [doctorAppointments, selectedStatus]);
 
   // Local static status updates (Accept / Reject)
-  const handleStatusChange = (appointmentId, newStatus) => {
+const handleAppointmentUpdate = async (appointmentId, newStatus) => {
+  try {
+    await updateAppointment(appointmentId, { appointmentStatus: newStatus });
     setAppointments((prev) =>
       prev.map((app) =>
         (app._id || app.id) === appointmentId
@@ -108,13 +111,12 @@ export default function AppointmentRequests() {
           : app
       )
     );
-
-    if (newStatus === "confirmed" || newStatus === "accepted") {
-      toast.success("Appointment request accepted!");
-    } else if (newStatus === "rejected") {
-      toast.error("Appointment request rejected.");
-    }
-  };
+    if (newStatus === "confirmed") toast.success("Appointment accepted!");
+    if (newStatus === "rejected") toast.error("Appointment rejected.");
+  } catch (err) {
+    toast.error("Failed to update appointment");
+  }
+};
 
   // Local Mark Completed & Navigation to Prescription Page
   const handleMarkCompleted = (appointment) => {
@@ -264,7 +266,7 @@ export default function AppointmentRequests() {
                         <Button
                           size="sm"
                           variant="flat"
-                          onPress={() => handleStatusChange(id, "confirmed")}
+                          onPress={() => handleAppointmentUpdate(id, "confirmed")}
                           className="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 font-bold rounded-xl border border-emerald-200"
                           startContent={<Check size={16} />}
                         >
@@ -274,7 +276,7 @@ export default function AppointmentRequests() {
                         <Button
                           size="sm"
                           variant="flat"
-                          onPress={() => handleStatusChange(id, "rejected")}
+                          onPress={() => handleAppointmentUpdate(id, "rejected")}
                           className="bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-xl border border-rose-200"
                           startContent={<Xmark size={16} />}
                         >
