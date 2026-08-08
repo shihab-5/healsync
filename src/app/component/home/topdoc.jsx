@@ -22,7 +22,7 @@ async function getDoctors() {
 const TopDoc = async () => {
     const doctors = await getDoctors();
 
-    const topDoctors = doctors.filter((doctor) => doctor.experience > 0 && doctor.verificationStatus === "verified").slice(0, 4);
+    const topDoctors = doctors.filter((doctor) => doctor.verificationStatus === "verified").slice(0, 4);
 
 
     if (!topDoctors || topDoctors.length === 0) {

@@ -45,6 +45,7 @@ export const getDoctorByUserId = async (userId) => {
 };
  
 export const updateDoctorProfile = async (doctorId, payload) => {
+  console.log('Updating doctor profile for doctorId:', doctorId, 'with payload:', payload); // Debugging line to check the payload
   // payload: any subset of { qualifications, experience, consultationFee, schedule, verificationStatus, status }
   const res = await fetch(`${BASE_URL}/api/doctors/${doctorId}`, {
     method: "PATCH",

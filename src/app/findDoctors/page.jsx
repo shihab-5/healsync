@@ -23,21 +23,22 @@ const FindDoctors = () => {
 
     // Fetch dynamic doctor lists from your live Express Backend server instance
     useEffect(() => {
-        const fetchDoctors = async () => {
-            try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/doctors`, {
-                    cache: "no-store" 
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    setDoctors(data);
-                    setFilteredDoctors(data);
-                }
-            } catch (error) {
-                console.error("Error retrieving doctor collection rows:", error);
-            } finally {
-                setLoading(false);
-            }
+      const fetchDoctors = async () => {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/doctors`, {
+            cache: "no-store" 
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const verifiedOnly = data.filter(doc => doc.verificationStatus === "verified");
+            setDoctors(verifiedOnly);
+            setFilteredDoctors(verifiedOnly);
+        }
+    } catch (error) {
+        console.error("Error retrieving doctor collection rows:", error);
+    } finally {
+        setLoading(false);
+    }
         };
         fetchDoctors();
     }, []);

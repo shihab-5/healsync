@@ -6,6 +6,7 @@ const DoctorDetails = async ({params}) => {
     const { id } =await params;
     // console.log('DoctorDetails id:', id); // Debugging line to check the received id
     const data=await getDoctorDetails(id);
+    
     // console.log('DoctorDetails data:', data); // Debugging line to check the fetched data
 
     if (!data) {

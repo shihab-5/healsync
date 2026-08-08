@@ -173,11 +173,10 @@ export default function ManageDoctors() {
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-center gap-4 min-w-0">
-                    <Avatar
-                      src={doc.profileImage || undefined}
-                      name={doc.doctorName}
-                      className="w-12 h-12 font-bold text-white bg-gradient-to-br from-teal-600 to-teal-400 rounded-xl shrink-0"
-                    />
+                  <Avatar className="w-12 h-12 ring-2 ring-teal-500/30 rounded-full shrink-0">
+              <Avatar.Image src={doc.profileImage || ""} alt={doc.doctorName} />
+              <Avatar.Fallback className="bg-gradient-to-br from-teal-700 to-teal-500 text-white font-bold">{doc.doctorName?.slice(0, 2).toUpperCase()}</Avatar.Fallback>
+            </Avatar>
                     <div className="flex flex-col min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-bold text-slate-800">
