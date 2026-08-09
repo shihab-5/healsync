@@ -119,8 +119,15 @@ const handleAppointmentUpdate = async (appointmentId, newStatus) => {
 };
 
   // Local Mark Completed & Navigation to Prescription Page
-  const handleMarkCompleted = (appointment) => {
-    const id = appointment._id || appointment.id;
+const handleMarkCompleted = async (appointment) => {
+  const id = appointment._id || appointment.id;
+  if (!id) {
+    toast.error("Unable to navigate: missing appointment ID.");
+    return;
+  }
+
+  try {
+    await updateAppointment(id, { appointmentStatus: "completed" });
 
     setAppointments((prev) =>
       prev.map((app) =>
@@ -133,14 +140,21 @@ const handleAppointmentUpdate = async (appointmentId, newStatus) => {
     toast.success("Marked as Completed!");
 
     const patientId = appointment.userId || appointment.patientId || "";
-    const queryParams = new URLSearchParams({
-      appointmentId: id,
-      patientId,
-      patientName: appointment.patientName || appointment.userEmail || "",
-    }).toString();
+    const patientName = appointment.patientName || appointment.userEmail || "";
+    const searchParams = new URLSearchParams();
 
-    router.push(`/dashboard/doctor/prescription?${queryParams}`);
-  };
+    searchParams.set("appointmentId", id);
+    if (patientId) searchParams.set("patientId", patientId);
+    if (patientName) searchParams.set("patientName", patientName);
+
+    const destination = "/dashboard/doctor/prescriptions" +
+      (searchParams.toString() ? `?${searchParams.toString()}` : "");
+
+    router.push(destination);
+  } catch (err) {
+    toast.error("Failed to mark appointment as completed");
+  }
+};
 
   if (isSessionPending || loading) {
     return (
