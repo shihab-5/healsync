@@ -98,7 +98,11 @@ export default async function MyAppointments() {
                 ) : (
                     /* Grid Layout Card Output List wrapper */
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {myAllAppointments.map((appointment) => (
+                        {myAllAppointments.map((appointment) => {
+                            const status = (appointment.appointmentStatus || "pending").toLowerCase();
+                            const isCompleted = status === "completed";
+
+                            return (
                             <Card
                                 key={appointment._id}
                                 className="border border-slate-200 bg-white rounded-2xl shadow-xs transition-all duration-300 hover:shadow-md hover:border-teal-200 group relative overflow-hidden"
@@ -116,9 +120,17 @@ export default async function MyAppointments() {
                                         <Chip
                                             size="sm"
                                             variant="flat"
-                                            className="bg-emerald-50 text-emerald-600 border border-emerald-100 font-bold tracking-wide uppercase text-[10px]"
+                                            className={`border font-bold tracking-wide uppercase text-[10px] ${
+                                                isCompleted
+                                                    ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                                                    : status === "rejected"
+                                                    ? "bg-rose-50 text-rose-600 border-rose-100"
+                                                    : status === "confirmed"
+                                                    ? "bg-blue-50 text-blue-600 border-blue-100"
+                                                    : "bg-amber-50 text-amber-600 border-amber-100"
+                                            }`}
                                         >
-                                            Appointment Status:<span className="font-black text-[10px] ml-1">{appointment.appointmentStatus || 'pending'}</span>
+                                            Appointment Status:<span className="font-black text-[10px] ml-1">{status}</span>
                                         </Chip>
                                     </div>
 
@@ -174,27 +186,35 @@ export default async function MyAppointments() {
                                     </div>
 
                                     {/* ✅ CRUD Action Interface Group Wrapper */}
-                                    <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-2 w-full">
+                                    {isCompleted ? (
+                                        /* Consultation finished — no actions available, status chip above says it all */
+                                        <div className="pt-4 border-t border-slate-100 flex items-center justify-center w-full">
+                                            <span className="text-xs font-bold text-emerald-600 uppercase tracking-wide">
+                                                Consultation Completed
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-2 w-full">
 
-                                        {/* 1. VIEW APPOINTMENT */}
+                                            {/* 1. VIEW APPOINTMENT */}
+                                            <View details={appointment}></View>
 
-                                        <View details={appointment}></View>
-
-                                        {/* 2. RESCHEDULE APPOINTMENT */}
-
-                                        <RescheduleModal
-                                            appointmentId={appointment._id}
-                                            doctorId={appointment.doctorId}
-                                            currentDay={appointment.day}
-                                            currentSlot={appointment.slot}
-                                            currentSymptoms={appointment.symptoms}
-                                        />
-                                        <DeleteAppointment appointmentId={appointment._id} appointments={allAppointments}></DeleteAppointment>
-                                    </div>
+                                            {/* 2. RESCHEDULE APPOINTMENT */}
+                                            <RescheduleModal
+                                                appointmentId={appointment._id}
+                                                doctorId={appointment.doctorId}
+                                                currentDay={appointment.day}
+                                                currentSlot={appointment.slot}
+                                                currentSymptoms={appointment.symptoms}
+                                            />
+                                            <DeleteAppointment appointmentId={appointment._id} appointments={allAppointments}></DeleteAppointment>
+                                        </div>
+                                    )}
 
                                 </Card.Content>
                             </Card>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
