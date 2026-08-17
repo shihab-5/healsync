@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import toast from 'react-hot-toast';
 
-const DeleteAppointment = ({ appointmentId, onDeleted }) => {
+const DeleteAppointment = ({ appointmentId, onDeleted, disabled = false }) => {
   const router = useRouter();
 
   const handleDelete = async () => {
@@ -23,12 +23,34 @@ const DeleteAppointment = ({ appointmentId, onDeleted }) => {
     }
   };
 
+  // Paid appointments can't be cancelled — show a disabled, non-interactive button instead
+  if (disabled) {
+    return (
+      <div>
+        <Button
+          variant="flat"
+          size="sm"
+          isDisabled
+          className="w-full bg-slate-50 text-slate-300 font-bold rounded-xl text-xs h-9 gap-1.5 border-none flex items-center justify-center cursor-not-allowed"
+        >
+          <TrashBin className="w-3.5 h-3.5" />
+          Cancel
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div>
       <AlertDialog>
-                                  <Button className="px-3 py-1.5 bg-rose-50/60 hover:bg-rose-100/80 text-rose-600 border border-rose-100/40 rounded-lg text-xs font-bold tracking-wide transition-colors flex items-center gap-1.5">
-                                  <TrashBin className="w-3 h-3" />
-                                  Cancel</Button>
+        <Button
+  variant="flat"
+  size="sm"
+  className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-xs h-9 gap-1.5 border-none flex items-center justify-center transition-colors"
+>
+  <TrashBin className="w-3.5 h-3.5" />
+  Cancel
+</Button>
                                   <AlertDialog.Backdrop>
                                     <AlertDialog.Container>
                                       <AlertDialog.Dialog className="sm:max-w-[400px]">
@@ -47,8 +69,8 @@ const DeleteAppointment = ({ appointmentId, onDeleted }) => {
                                           <Button slot="close" variant="tertiary">
                                             Cancel
                                           </Button>
-                                          <Button slot="close" variant="danger" onClick={() => handleDelete(appointmentId)}>
-                                            Delete 
+                                          <Button slot="close" variant="danger" onClick={handleDelete}>
+                                            Delete
                                           </Button>
                                         </AlertDialog.Footer>
                                       </AlertDialog.Dialog>

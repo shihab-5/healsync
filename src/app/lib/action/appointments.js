@@ -12,26 +12,37 @@ const getToken = async () => {
   });
   return session?.session?.token;
 };
-export const bookAppointments = async (data)=>{
-  console.log('bookAppointments called with data:', data); // Debugging line to check the data being sent
-  const token = await getToken();
-  console.log('Token retrieved:', token); // Debugging line to check the token
-    console.log('Booking appointment with data:', data); // Debugging line to check the data being sent
-    const res=await fetch(`${baseUrl}/api/appointments`, {
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json",
-            authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(data),
-    });
-     return res.json();
-}
+export const bookAppointments = async (data) => {
+  console.log('bookAppointments called with data:', data);
+  // const token = await getToken();
+
+  const res = await fetch(`${baseUrl}/api/appointments`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      // authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  console.log('Response from server:', res); // Debugging line to check the response object 
+  let result;
+  try {
+    result = await res.json();
+  } catch {
+    throw new Error('Unexpected response from server');
+  }
+
+  if (!res.ok) {
+    throw new Error(result?.error || 'Failed to book appointment');
+  }
+
+  return result;
+};
 
 export const deleteAppointment = async (appointmentId) => {
   const token = await getToken();
 
-  const res = await fetch(`${baseUrl}/api/appointments/${appointmentId}`, {
+  const res = await fetch(`${baseUrl}/appointments/${appointmentId}`, {
     method: "DELETE",
     headers: {
       authorization: `Bearer ${token}`,
@@ -63,20 +74,18 @@ export const deleteAppointment = async (appointmentId) => {
   };
 };
 
-export const updateAppointment =async (appointmentId, data) => {
-  console.log('updateAppointment called with appointmentId:', appointmentId, 'and data:', data); 
-  const res =await fetch(`${baseUrl}/api/appointments/${appointmentId}`,
-    {
-      method:"PATCH",
-      headers:{
-        "content-type":"application/json",
-      },
-      body:JSON.stringify(data),
-
-      });
-   data=await res.json();
-   return data;
-    }
+export const updateAppointment = async (appointmentId, data) => {
+  console.log('updateAppointment called with appointmentId:', appointmentId, 'and data:', data);
+  const res = await fetch(`${baseUrl}/api/appointments/${appointmentId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  const responseData = await res.json();
+  return responseData;
+};
   
 
 
@@ -86,7 +95,7 @@ export const updateAppointmentStatus = async (appointmentId, { day, slot, sympto
 
   let res;
   try {
-    res = await fetch(`${baseUrl}/api/appointments/${appointmentId}`, {
+    res = await fetch(`${baseUrl}/appointments/${appointmentId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -144,7 +153,7 @@ export const payments = async (data) => {
 };
 
 export async function getAppointments() {
-  const res = await fetch(`${baseUrl}/api/appointments`, {
+  const res = await fetch(`${baseUrl}/appointments`, {
     cache: "no-store",
   });
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { getAppointments } from '@/app/lib/action/appointments';
 import { getReviews } from '@/app/lib/action/review';
 import { getUserSession } from '@/app/lib/session';
 
@@ -15,6 +14,7 @@ import {
   ChevronRight,
   StarFill
 } from "@gravity-ui/icons"; 
+import { getAppointments } from '@/app/lib/data';
 
 const DoctorDashBoard = async () => {
   // Fetch raw server data

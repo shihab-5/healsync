@@ -12,13 +12,13 @@ const View = ({ details }) => {
       <Modal>
         
         {/* Trigger */}
-        <Button
-          variant="flat"
-          size="sm"
-          className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs h-9 gap-1.5 border-none"
-        >
-          <Eye style={{ fontSize: '14px' }} /> View Details
-        </Button>
+      <Button
+  variant="flat"
+  size="sm"
+  className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs h-9 gap-1.5 border-none flex items-center justify-center"
+>
+  <Eye className="w-3.5 h-3.5" /> View Details
+</Button>
 
         <Modal.Backdrop>
           <Modal.Container>

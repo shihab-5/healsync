@@ -5,11 +5,16 @@ const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL; // adjust to your backend po
 /**
  * Fetch all prescriptions (optionally filtered by doctor)
  */
-export async function getPrescriptions(doctorId = null) {
+export async function getPrescriptions(filters = {}) {
   try {
-    const url = doctorId
-      ? `${baseUrl}/api/prescriptions?doctorId=${doctorId}`
+    const params = new URLSearchParams(
+      Object.entries(filters).filter(([_, v]) => v) // drop empty/null values
+    ).toString();
+
+    const url = params
+      ? `${baseUrl}/api/prescriptions?${params}`
       : `${baseUrl}/api/prescriptions`;
+
     const res = await fetch(url, { cache: "no-store" });
     const data = await res.json();
     return data;

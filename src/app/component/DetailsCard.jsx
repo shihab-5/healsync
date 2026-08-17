@@ -4,19 +4,19 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
+import { bookAppointments } from '../lib/action/appointments';
+import { toast } from 'react-toastify';
 
 const DetailsCard = ({ value }) => {
     const router = useRouter();
     const { data: session, isPending } = authClient.useSession();
     const user = session?.user;
-    console.log("Current user session:", user);
-    console.log("Doctor details:", value);
-    // Interactive states for booking selection layout
+
     const [selectedDay, setSelectedDay] = useState(value.availableDays?.[0] || '');
     const [selectedSlot, setSelectedSlot] = useState(value.availableSlots?.[0] || '');
     const [symptoms, setSymptoms] = useState('');
-    const [isProcessing, setIsProcessing] = useState(false); // ✅ Added checkout loading state
-    console.log("Current user session:", value);
+    const [isProcessing, setIsProcessing] = useState(false);
+
     if (isPending) {
         return <div className="min-h-[400px] flex items-center justify-center font-medium text-gray-500">Loading your profile...</div>;
     }
@@ -35,56 +35,45 @@ const DetailsCard = ({ value }) => {
         );
     }
 
-    // Normalize display naming configurations
     const displayName = value.doctorName?.startsWith("Dr.") ? value.doctorName : `Dr. ${value.doctorName}`;
-    
+
     const qualificationsList = Array.isArray(value.qualifications)
         ? value.qualifications
         : value.qualifications?.split(',').map(q => q.trim()) || ["MBBS"];
 
-    // ✅ Dynamic Client Checkout Submission Handler
-    const handleCheckout = async (e) => {
-        e.preventDefault();
-        setIsProcessing(true);
+    // ✅ Book appointment directly instead of going through Stripe checkout
+const handleBookAppointment = async (e) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    console.log(e)
 
-        try {
-            const response = await fetch(`/api/checkout_sessions`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    doctorId: value.userId,
-                    doctorName: value.doctorName,
-                    consultationFee: value.consultationFee,
-                    day: selectedDay,
-                    slot: selectedSlot,
-                    symptoms: symptoms,                 
-                    userEmail: user?.email,
-                    userId: user?.id,
-                    appointmentStatus: "pending", 
-                }),
-            });
+    try {
+        await bookAppointments({
+            doctorId: value.userId || value._id || value.id,
+            doctorName: value.doctorName,
+            consultationFee: value.consultationFee,
+            day: selectedDay,
+            slot: selectedSlot,
+            symptoms: symptoms,
+            userEmail: user?.email,
+            userId: user?.id,
+            patientId: user?.id,
+            appointmentStatus: "pending",
+        });
 
-            const data = await response.json();
-
-            if (data.url) {
-                // Redirect user to Stripe Checkout site directly
-                window.location.href = data.url;
-            } else {
-                alert(data.error || "Failed to generate checkout gateway session.");
-            }
-        } catch (error) {
-            console.error("Checkout submission failed:", error);
-            alert("Connection error occurred. Please try again.");
-        } finally {
-            setIsProcessing(false);
-        }
-    };
-
+        toast.success("Appointment booked successfully!");
+        router.push('/findDoctors');
+    } catch (error) {
+        console.error("Booking submission failed:", error);
+        toast.error(error.message || "Failed to book appointment. Please try again.");
+    } finally {
+        setIsProcessing(false);
+    }
+};
     return (
         <div className="max-w-7xl mx-auto px-4 py-10 font-sans text-gray-800">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* ... everything above the form is unchanged ... */}
+   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
                 {/* ================= LEFT MAIN PANEL (8 Columns) ================= */}
                 <div className="lg:col-span-8 space-y-6">
@@ -208,21 +197,21 @@ const DetailsCard = ({ value }) => {
                                 className="w-full text-sm p-3.5 bg-slate-50/50 border border-gray-200 rounded-xl focus:outline-none focus:border-teal-700 focus:bg-white resize-none"
                             />
                         </div>
+ 
+            <form onSubmit={handleBookAppointment}>
+                <button 
+                    type="submit" 
+                    disabled={isProcessing}
+                    className="w-full text-center bg-teal-700 hover:bg-teal-600 disabled:bg-teal-800 text-white font-bold text-sm py-3.5 rounded-xl transition-all shadow-sm"
+                >
+                    {isProcessing ? 'Booking...' : 'Confirm Appointment'}
+                </button>
+            </form>
 
-                        {/* ✅ Form Submission replaced with onSubmit AJAX interceptor handling setup */}
-                        <form onSubmit={handleCheckout}>
-                            <button 
-                                type="submit" 
-                                disabled={isProcessing}
-                                className="w-full text-center bg-teal-700 hover:bg-teal-600 disabled:bg-teal-800 text-white font-bold text-sm py-3.5 rounded-xl transition-all shadow-sm"
-                            >
-                                {isProcessing ? 'Processing Payment...' : 'Proceed to Payment'}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-            </div>
+            {/* ... rest unchanged ... */}
+        </div>
+        </div>
+        </div>
         </div>
     );
 };

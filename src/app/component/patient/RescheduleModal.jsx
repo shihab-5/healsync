@@ -131,14 +131,14 @@ export const RescheduleModal = ({ appointmentId, doctorId, currentDay, currentSl
 
   return (
     <>
-      <Button
-        size="sm"
-        onClick={() => setIsOpen(true)}
-        className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold z-30 rounded-xl text-xs h-9 gap-1.5 border-none shadow-xs"
-      >
-        <Calendar style={{ fontSize: '14px' }} />
-        Reschedule
-      </Button>
+     <Button
+  size="sm"
+  onClick={() => setIsOpen(true)}
+  className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs h-9 gap-1.5 border-none shadow-xs flex items-center justify-center"
+>
+  <Calendar className="w-3.5 h-3.5" />
+  Reschedule
+</Button>
 
       {isOpen && (
         <div

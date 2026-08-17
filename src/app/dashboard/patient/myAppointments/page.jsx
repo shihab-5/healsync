@@ -14,6 +14,8 @@ import { getAppointments } from '@/app/lib/data';
 import DeleteAppointment from '@/app/component/patient/deleteAppointment';
 import View from '@/app/component/patient/view';
 import { RescheduleModal } from '@/app/component/patient/RescheduleModal';
+import PrescriptionViewModal from '@/app/component/dashB/PrescriptionViewModal';
+import PayNowButton from '@/app/component/patient/PayNowButton';
 
 export default async function MyAppointments() {
     // 1. Fetch user session and global appointments concurrently on the server
@@ -22,30 +24,13 @@ export default async function MyAppointments() {
         getAppointments()
     ]);
 
-
-
     // Fallback context mock matching your raw data architecture safely
-    const activeUser = user || {
-        // id: "6a41bd494864f27d2d465832",
-        // email: "shihabuli364@gmail.com"
-    };
+    const activeUser = user || {};
 
     // 2. Filter data securely to capture only records corresponding to this user
     const myAllAppointments = allAppointments?.filter(
         (app) => app.userId === activeUser.id || app.userEmail === activeUser.email
     ) || [];
-
-    //    const handleDelete = async (appointmentId) => {
-    //    const data =await deleteAppointment(appointmentId);
-    //    if (data.deleteAppointment) {
-    //     toast.success('Appointment cancelled successfully');
-    //    }
-    //    else {
-    //     toast.error('Failed to cancel appointment');
-    //    }
-    // }
-
-    // console.log(myAllAppointments)
 
     return (
         <div className="w-full min-h-screen bg-slate-50/60 p-4 md:p-10 text-slate-800 font-sans">
@@ -100,6 +85,7 @@ export default async function MyAppointments() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {myAllAppointments.map((appointment) => {
                             const status = (appointment.appointmentStatus || "pending").toLowerCase();
+                            const paymentStatus = (appointment.paymentStatus || "unpaid").toLowerCase();
                             const isCompleted = status === "completed";
 
                             return (
@@ -186,20 +172,43 @@ export default async function MyAppointments() {
                                     </div>
 
                                     {/* ✅ CRUD Action Interface Group Wrapper */}
-                                    {isCompleted ? (
-                                        /* Consultation finished — no actions available, status chip above says it all */
-                                        <div className="pt-4 border-t border-slate-100 flex items-center justify-center w-full">
-                                            <span className="text-xs font-bold text-emerald-600 uppercase tracking-wide">
-                                                Consultation Completed
-                                            </span>
+                                    {status === "completed" ? (
+                                        /* Consultation finished — only prescription access, opened via modal */
+                                        <div className="pt-4 border-t border-slate-100 flex justify-center w-full">
+                                            <PrescriptionViewModal appointmentId={appointment._id} />
+                                        </div>
+                                    ) : status === "confirmed" ? (
+                                        /* Confirmed — same 3 actions plus payment option, arranged as a 2x2 grid */
+                                        <div className="pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 w-full">
+                                            <View details={appointment} />
+
+                                            <RescheduleModal
+                                                appointmentId={appointment._id}
+                                                doctorId={appointment.doctorId}
+                                                currentDay={appointment.day}
+                                                currentSlot={appointment.slot}
+                                                currentSymptoms={appointment.symptoms}
+                                            />
+
+                                            <DeleteAppointment
+                                                appointmentId={appointment._id}
+                                                appointments={allAppointments}
+                                                disabled={paymentStatus === "paid"}
+                                            />
+
+                                            {paymentStatus === "paid" ? (
+                                                <div className="flex items-center justify-center bg-emerald-50 border border-emerald-100 text-emerald-600 font-bold rounded-xl text-xs h-9 gap-1.5">
+                                                    <CreditCard className="w-3.5 h-3.5" />
+                                                    Paid
+                                                </div>
+                                            ) : (
+                                                <PayNowButton appointmentId={appointment._id} />
+                                            )}
                                         </div>
                                     ) : (
+                                        /* Pending (default) — original 3 actions, unchanged */
                                         <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-2 w-full">
-
-                                            {/* 1. VIEW APPOINTMENT */}
                                             <View details={appointment}></View>
-
-                                            {/* 2. RESCHEDULE APPOINTMENT */}
                                             <RescheduleModal
                                                 appointmentId={appointment._id}
                                                 doctorId={appointment.doctorId}
