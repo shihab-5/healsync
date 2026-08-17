@@ -140,12 +140,12 @@ const handleMarkCompleted = async (appointment) => {
     toast.success("Marked as Completed!");
 
     const patientId = appointment.userId || appointment.patientId || "";
-    const patientName = appointment.patientName || appointment.userEmail || "";
+    const patientName = appointment.userEmail || "";
     const searchParams = new URLSearchParams();
 
     searchParams.set("appointmentId", id);
     if (patientId) searchParams.set("patientId", patientId);
-    if (patientName) searchParams.set("patientName", patientName);
+    if (patientName) searchParams.set("patientEmail", patientName);
 
     const destination = "/dashboard/doctor/prescriptions" +
       (searchParams.toString() ? `?${searchParams.toString()}` : "");
@@ -231,7 +231,7 @@ const handleMarkCompleted = async (appointment) => {
 
                     <div className="space-y-1.5">
                       <h3 className="text-base font-extrabold text-slate-800">
-                        {app.patientName}
+                        {app.userEmail}
                       </h3>
                       <p className="text-xs font-medium text-slate-400">
                         {app.day || app.date || "2025-07-15"} at {app.slot || app.time || "10:00 AM"}

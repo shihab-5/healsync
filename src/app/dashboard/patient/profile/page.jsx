@@ -1,10 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { ShieldCheck, Calendar, CircleExclamation, Key } from '@gravity-ui/icons';
 import Image from 'next/image';
+import { authClient } from '@/lib/auth-client';
+import { getPrescriptions } from '@/app/lib/action/prescription';
 
 // Master orchestrated entrance transitions
 const containerVariants = {
@@ -25,7 +27,11 @@ const cardEntranceVariants = {
   }
 };
 
-const PatientProfile = ({ user }) => {
+const PatientProfile = () => {
+  const { data: session } = authClient.useSession();
+  const user = session?.user || null;
+  const [prescriptions, setPrescriptions] = useState([]);
+
   const rawDate = user?.createdAt?.$date || user?.createdAt;
   const accountCreatedDate = rawDate 
     ? new Date(rawDate).toLocaleDateString('en-US', {
@@ -37,6 +43,23 @@ const PatientProfile = ({ user }) => {
 
   const accountId = user?._id?.$oid || 'No ID available';
   const isVerified = user?.emailVerified ?? false;
+
+  useEffect(() => {
+    const load = async () => {
+      if (!user) return;
+      // prefer standard user id shapes
+      const userId = user?.id || user?._id || user?.userId || user?.sub;
+      try {
+        const data = await getPrescriptions({ userId });
+        // API may return array or single object
+        setPrescriptions(Array.isArray(data) ? data : data ? [data] : []);
+      } catch (err) {
+        console.error('Failed loading prescriptions for user', err);
+        setPrescriptions([]);
+      }
+    };
+    load();
+  }, [user]);
 
   return (
     <motion.div 
@@ -101,10 +124,10 @@ const PatientProfile = ({ user }) => {
               <div className="flex flex-col items-center sm:items-start space-y-3 flex-1 text-center sm:text-left">
                 <div className="space-y-0.5">
                   <h2 className="text-2xl font-bold tracking-tight text-white capitalize">
-                    {user?.name || 'Meaw'}
+                    {user?.name }
                   </h2>
                   <p className="text-teal-100/60 text-sm font-medium">
-                    {user?.email || 'meaw@meaw.com'}
+                    {user?.email }
                   </p>
                 </div>
 
@@ -181,6 +204,45 @@ const PatientProfile = ({ user }) => {
           </motion.div>
 
         </div>
+
+        {/* Patient Prescriptions List */}
+        <motion.div variants={cardEntranceVariants} className="mt-6">
+          <h3 className="text-xl font-bold mb-3">Prescriptions</h3>
+          {prescriptions.length === 0 ? (
+            <p className="text-sm text-teal-100/70">No prescriptions found for this account.</p>
+          ) : (
+            <div className="space-y-3">
+              {prescriptions.map((p) => (
+                <Card key={p._id || p.id || JSON.stringify(p)} className="p-4 bg-black/10 border border-white/5 rounded-xl">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="text-sm text-teal-200/60 font-bold">Patient</div>
+                      <div className="text-white font-semibold">{p.patientName || user?.name || 'Unknown'}</div>
+                      {p.diagnosis && <div className="text-sm text-teal-100/70 mt-1">{p.diagnosis}</div>}
+                    </div>
+                    <div className="text-right text-xs text-teal-200/60">
+                      {p.date || p.createdAt || ''}
+                    </div>
+                  </div>
+                  {p.medications?.length > 0 && (
+                    <div className="mt-3 text-sm">
+                      <div className="text-teal-200/60 text-xs font-bold mb-1">Medications</div>
+                      <ul className="list-inside list-decimal space-y-1">
+                        {p.medications.map((m, i) => (
+                          <li key={i} className="text-white">
+                            <span className="font-extrabold">{m.name}</span>
+                            {m.dosage && <span className="text-teal-100/70"> — {m.dosage}</span>}
+                            {m.instructions && <span className="text-teal-200/50"> · {m.instructions}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </Card>
+              ))}
+            </div>
+          )}
+        </motion.div>
       </div>
     </motion.div>
   );

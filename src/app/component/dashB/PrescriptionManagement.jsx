@@ -17,7 +17,7 @@ import {
 export default function PrescriptionManagement() {
   const searchParams = useSearchParams();
   console.log("searchParams:", searchParams); // ✅ safe here, inside a browser component
-  const queryPatientName = searchParams.get("patientName") || "";
+  const queryPatientEmail = searchParams.get("patientEmail") || "";
   const queryAppointmentId = searchParams.get("appointmentId") || "";
   const queryPatientId = searchParams.get("patientId") || "";
   const { data: session, isPending: isSessionPending } = authClient.useSession();
@@ -25,6 +25,8 @@ export default function PrescriptionManagement() {
 
   const [doctors, setDoctors] = useState([]);
   console.log("queryAppointmentId:", queryAppointmentId); // ✅ safe here, inside a browser component
+  console.log("queryPatientId:", queryPatientId); // ✅ safe here, inside a browser component
+  console.log("queryPatientEmail:", queryPatientEmail); // ✅ safe here, inside a browser component
   // Modal Open/Close State
   const [isOpen, setIsOpen] = useState(false);
 
@@ -94,10 +96,10 @@ export default function PrescriptionManagement() {
 
   // Pre-fill form when redirected from appointments
   useEffect(() => {
-    if (queryPatientName) {
-      handleOpenCreateModal(queryPatientName);
+    if (queryPatientEmail) {
+      handleOpenCreateModal(queryPatientEmail);
     }
-  }, [queryPatientName]);
+  }, [queryPatientEmail]);
 
   const handleOpenCreateModal = (presetName = "") => {
     setEditingId(null);
@@ -338,10 +340,10 @@ export default function PrescriptionManagement() {
                 <Modal.Body className="space-y-4 py-4">
                   <div>
                     <label className="text-xs font-bold text-slate-600 block mb-1">
-                      Patient Name *
+                      Patient Email *
                     </label>
                     <Input
-                      placeholder="Enter patient name"
+                      placeholder="Enter patient Email"
                       value={patientName}
                       onChange={(e) => setPatientName(e.target.value)}
                       required
