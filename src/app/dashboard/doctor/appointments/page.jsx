@@ -212,6 +212,7 @@ const handleMarkCompleted = async (appointment) => {
       ) : (
         <div className="space-y-4">
           {filteredAppointments.map((app) => {
+            console.log("Rendering appointment:", app);
             const id = app._id || app.id;
             const rawStatus = (app.appointmentStatus || "pending").toLowerCase();
             const status = rawStatus === "accepted" ? "confirmed" : rawStatus;
@@ -232,6 +233,9 @@ const handleMarkCompleted = async (appointment) => {
                     <div className="space-y-1.5">
                       <h3 className="text-base font-extrabold text-slate-800">
                         {app.userEmail}
+                      </h3>
+                      <h3 className="text-base font-medium text-slate-600">
+                        {app.paymentStatus}
                       </h3>
                       <p className="text-xs font-medium text-slate-400">
                         {app.day || app.date || "2025-07-15"} at {app.slot || app.time || "10:00 AM"}

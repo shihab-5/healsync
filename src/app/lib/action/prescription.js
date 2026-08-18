@@ -6,6 +6,7 @@ const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL; // adjust to your backend po
  * Fetch all prescriptions (optionally filtered by doctor)
  */
 export async function getPrescriptions(filters = {}) {
+  console.log("Fetching prescriptions with filters:", filters);
   try {
     const params = new URLSearchParams(
       Object.entries(filters).filter(([_, v]) => v) // drop empty/null values
@@ -17,6 +18,7 @@ export async function getPrescriptions(filters = {}) {
 
     const res = await fetch(url, { cache: "no-store" });
     const data = await res.json();
+    console.log("Fetched prescriptions:", data);
     return data;
   } catch (error) {
     console.error("Failed to fetch prescriptions:", error);

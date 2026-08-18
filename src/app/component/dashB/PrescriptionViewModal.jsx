@@ -18,8 +18,10 @@ export default function PrescriptionViewModal({ appointmentId }) {
 
     setLoading(true);
     try {
-      const data = await getPrescriptions(appointmentId);
-      setPrescription(data);
+      const data = await getPrescriptions({ appointmentId });
+      // getPrescriptions always returns an array — unwrap it to a single object
+      const found = Array.isArray(data) && data.length > 0 ? data[0] : null;
+      setPrescription(found);
       setFetched(true);
     } catch (err) {
       toast.error("Failed to load prescription");

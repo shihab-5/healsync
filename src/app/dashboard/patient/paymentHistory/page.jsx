@@ -41,11 +41,15 @@ const PaymentHistory = () => {
         );
         setPayments(mine);
 
-        // doctorId -> doctorName lookup, since payments only store the id.
+        // doctorId -> doctorName lookup.
+        // IMPORTANT: appointments/payments store doctorId as the doctor's *userId*
+        // (their account id), NOT the doctor profile document's own _id.
+        // Key the map by both so the lookup works regardless of which id ends up stored.
         const map = {};
         (allDoctors || []).forEach((doc) => {
-          const id = doc._id?.$oid || doc._id;
-          map[id] = doc.doctorName;
+          const docObjId = doc._id?.$oid || doc._id;
+          if (doc.userId) map[doc.userId] = doc.doctorName;
+          if (docObjId) map[docObjId] = doc.doctorName;
         });
         setDoctorMap(map);
       } catch (err) {
