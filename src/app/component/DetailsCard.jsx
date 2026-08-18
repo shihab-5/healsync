@@ -7,6 +7,45 @@ import { authClient } from '@/lib/auth-client';
 import { bookAppointments } from '../lib/action/appointments';
 import { toast } from 'react-toastify';
 
+// ── Static doctor practice-location lookup ────────────────────────────────
+// Edit these to match your real doctors. Matched first by exact email
+// (preferred, most reliable), falling back to the doctor's first name
+// if no email match is found.
+const DOCTOR_LOCATIONS_BY_EMAIL = {
+    "dr.sarah@healsync.com": "Sunrise Medical Center, 4th Floor, Room 402 — Gulshan, Dhaka",
+    "dr.ahmed@healsync.com": "Green Life Hospital, Cardiology Wing — Dhanmondi, Dhaka",
+    "dr.mataur@healsync.com": "Apollo Health Complex, Suite 210 — Bashundhara, Dhaka",
+    "dr.nusrat@healsync.com": "United Medical College Hospital, OPD 5 — Mohakhali, Dhaka",
+    "dr.rahim@healsync.com": "Square Hospital, Consultation Block B — Panthapath, Dhaka",
+};
+
+const DOCTOR_LOCATIONS_BY_FIRST_NAME = {
+    sarah: "Sunrise Medical Center, 4th Floor, Room 402 — Gulshan, Dhaka",
+    ahmed: "Green Life Hospital, Cardiology Wing — Dhanmondi, Dhaka",
+    mataur: "Apollo Health Complex, Suite 210 — Bashundhara, Dhaka",
+    nusrat: "United Medical College Hospital, OPD 5 — Mohakhali, Dhaka",
+    rahim: "Square Hospital, Consultation Block B — Panthapath, Dhaka",
+};
+
+function getDoctorLocation(value) {
+    const emailKey = value.email?.toLowerCase();
+    if (emailKey && DOCTOR_LOCATIONS_BY_EMAIL[emailKey]) {
+        return DOCTOR_LOCATIONS_BY_EMAIL[emailKey];
+    }
+
+    const firstName = value.doctorName
+        ?.replace(/^dr\.?\s*/i, "")
+        ?.split(" ")[0]
+        ?.toLowerCase();
+
+    if (firstName && DOCTOR_LOCATIONS_BY_FIRST_NAME[firstName]) {
+        return DOCTOR_LOCATIONS_BY_FIRST_NAME[firstName];
+    }
+
+    return value.hospitalName || "Location will be confirmed after booking.";
+}
+// ────────────────────────────────────────────────────────────────────────
+
 const DetailsCard = ({ value }) => {
     const router = useRouter();
     const { data: session, isPending } = authClient.useSession();
@@ -40,6 +79,8 @@ const DetailsCard = ({ value }) => {
     const qualificationsList = Array.isArray(value.qualifications)
         ? value.qualifications
         : value.qualifications?.split(',').map(q => q.trim()) || ["MBBS"];
+
+    const practiceLocation = getDoctorLocation(value);
 
     // ✅ Book appointment directly instead of going through Stripe checkout
 const handleBookAppointment = async (e) => {
@@ -121,6 +162,12 @@ const handleBookAppointment = async (e) => {
                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                         <h2 className="text-lg font-black text-gray-900 tracking-tight mb-3">About</h2>
                         <p className="text-gray-500 text-sm leading-relaxed font-medium">{value.bio || "No biography provided."}</p>
+                    </div>
+
+                    {/* Practice Location — static lookup by doctor email/first name */}
+                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                        <h2 className="text-lg font-black text-gray-900 tracking-tight mb-3">Practice Location</h2>
+                        <p className="text-gray-500 text-sm leading-relaxed font-medium">{practiceLocation}</p>
                     </div>
 
                     {/* Qualifications */}
