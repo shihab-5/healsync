@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import toast from 'react-hot-toast';
 
-const DeleteAppointment = ({ appointmentId, onDeleted, disabled = false }) => {
+const DeleteAppointment = ({ appointmentId, onDeleted, disabled = false, buttonClass }) => {
   const router = useRouter();
 
   const handleDelete = async () => {
@@ -31,7 +31,7 @@ const DeleteAppointment = ({ appointmentId, onDeleted, disabled = false }) => {
           variant="flat"
           size="sm"
           isDisabled
-          className="w-full bg-slate-50 text-slate-300 font-bold rounded-xl text-xs h-9 gap-1.5 border-none flex items-center justify-center cursor-not-allowed"
+          className={buttonClass || "w-full bg-slate-50 text-slate-300 font-bold rounded-xl text-xs h-9 gap-1.5 border-none flex items-center justify-center cursor-not-allowed"}
         >
           <TrashBin className="w-3.5 h-3.5" />
           Cancel
@@ -46,7 +46,7 @@ const DeleteAppointment = ({ appointmentId, onDeleted, disabled = false }) => {
         <Button
   variant="flat"
   size="sm"
-  className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-xs h-9 gap-1.5 border-none flex items-center justify-center transition-colors"
+  className={buttonClass || "w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-xs h-9 gap-1.5 border-none flex items-center justify-center transition-colors"}
 >
   <TrashBin className="w-3.5 h-3.5" />
   Cancel

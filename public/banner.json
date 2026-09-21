@@ -1,0 +1,18 @@
+{
+  "style": {
+    "illustration_type": "flat 2D vector illustration, Japanese manga line art style",
+    "line_art": "clean, fine dark brown outlines with solid pastel color fills",
+    "color_palette": "soft pastel tones (peach pink, pale yellow, slate blue, white, muted beige)",
+    "shading": "minimalist, flat color blocks without gradients or harsh shadows"
+  },
+  "subject": {
+    "scene": "friendly medical consultation in a doctor's office",
+    "doctor": "male doctor with short brown hair, wearing glasses, a white lab coat, orange tie, slate blue trousers, and a stethoscope around his neck, smiling and holding one index finger up in an explaining gesture",
+    "patient": "elderly woman with short grey hair, wearing a peach-pink cardigan, pale yellow pants, and pink slip-on shoes, sitting on a round stool facing the doctor with a raised hand",
+    "environment": "clean white background with a minimalist desk, a computer monitor, and a pencil holder between them"
+  },
+  "composition": {
+    "framing": "side-profile view, centered full-body composition",
+    "mood": "warm, approachable, cheerful, professional healthcare advice"
+  }
+}

@@ -5,7 +5,7 @@ import { Button } from "@heroui/react";
 import { CreditCard } from "@gravity-ui/icons";
 import toast from "react-hot-toast";
 
-export default function PayNowButton({ appointmentId }) {
+export default function PayNowButton({ appointmentId, buttonClass }) {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleCheckout = async () => {
@@ -36,7 +36,7 @@ export default function PayNowButton({ appointmentId }) {
     <Button
       onPress={handleCheckout}
       disabled={isProcessing}
-      className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-teal-800 text-white font-bold rounded-xl text-xs h-9 gap-1.5 border-none shadow-xs flex items-center justify-center transition-colors"
+      className={buttonClass || "w-full bg-teal-600 hover:bg-teal-700 disabled:bg-teal-800 text-white font-bold rounded-xl text-xs h-9 gap-1.5 border-none shadow-xs flex items-center justify-center transition-colors"}
     >
       <CreditCard className="w-3.5 h-3.5" />
       {isProcessing ? "Redirecting..." : "Pay Now"}

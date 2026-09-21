@@ -4,7 +4,7 @@ import React from 'react';
 import { Modal, Button } from "@heroui/react";
 import { Eye } from '@gravity-ui/icons';
 
-const View = ({ details }) => {
+const View = ({ details, buttonClass }) => {
   if (!details) return null;
 
   return (
@@ -13,17 +13,16 @@ const View = ({ details }) => {
         
         {/* Trigger */}
       <Button
-  variant="flat"
-  size="sm"
-  className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs h-9 gap-1.5 border-none flex items-center justify-center"
->
-  <Eye className="w-3.5 h-3.5" /> View Details
-</Button>
+        variant="flat"
+        size="sm"
+        className={buttonClass || "w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs h-9 gap-1.5 border-none flex items-center justify-center"}
+      >
+        <Eye className="w-3.5 h-3.5" /> View Details
+      </Button>
 
-        <Modal.Backdrop>
-          <Modal.Container>
-            <Modal.Dialog className="sm:max-w-[520px]">
-              
+      <Modal.Backdrop>
+        <Modal.Container>
+          <Modal.Dialog className="sm:max-w-[520px]">
               <Modal.Header>
                 <Modal.Heading className="text-xl font-bold text-slate-900">
                   Detailed Medical Summary
