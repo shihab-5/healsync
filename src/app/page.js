@@ -3,13 +3,15 @@ import Banner from "./component/Banner";
 import TopDoc from "./component/home/topdoc";
 import Specializations from "./component/home/special";
 import Platform from "./component/home/Platform";
+import WhyChooseUs from "./component/home/WhyChooseUs";
 
 export default function Home() {
   return (
    <>
    <Banner></Banner>
+   <WhyChooseUs></WhyChooseUs>
+    <Platform></Platform>
    <TopDoc></TopDoc>
-  <Platform></Platform>
    <Specializations></Specializations>
    </>
   );

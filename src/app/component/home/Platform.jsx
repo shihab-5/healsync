@@ -21,91 +21,131 @@ const Platform = async () => {
     const totalAppointments = appointments?.length || 0;
     const totalReviews = 142; 
 
-    const statCards = [
-        {
-            id: 'doctors',
-            title: 'Active Doctors',
-            value: totalDoctors,
-            subtitle: 'Verified specialists',
-            icon: <GraduationCap style={{ fontSize: '22px' }} />
-        },
-        {
-            id: 'patients',
-            title: 'Total Patients',
-            value: totalPatients,
-            subtitle: 'Registered users',
-            icon: <Person style={{ fontSize: '22px' }} />
-        },
-        {
-            id: 'appointments',
-            title: 'Appointments',
-            value: totalAppointments,
-            subtitle: 'Booked consultations',
-            icon: <Calendar style={{ fontSize: '22px' }} />
-        },
-        {
-            id: 'reviews',
-            title: 'Platform Reviews',
-            value: totalReviews,
-            subtitle: 'Average 4.9/5 rating',
-            icon: <Star style={{ fontSize: '22px' }} />
-        }
-    ];
-
     return (
-        /* ✅ Main Background: Upgraded to a rich gradient featuring #0D9488 with deep teal anchors */
-        <div className="relative min-w-screen bg-gradient-to-br from-[#022c22] via-[#0D9488] to-[#115e59] p-6 md:p-10 text-white overflow-hidden flex flex-col justify-center items-center">
+        <section className="w-full bg-[#f8faf9] py-6 px-4 md:px-8 text-slate-900 flex justify-center items-center">
             
-            {/* Ambient lighting overlays to enrich the background gradient depth */}
-            <div className="absolute top-0 right-1/4 w-[600px] h-[400px] bg-white/5 rounded-full blur-[120px] pointer-events-none -z-10" />
-            <div className="absolute -bottom-10 -left-10 w-[400px] h-[400px] bg-black/20 rounded-full blur-[100px] pointer-events-none -z-10" />
-
-            <div className="w-full max-w-7xl space-y-10 z-10">
-                {/* Header Section */}
-                <div className="flex flex-col items-center text-center space-y-2">
-                    <span className="text-[10px] font-bold tracking-widest uppercase bg-white/10 px-3 py-1 rounded-full border border-white/20 backdrop-blur-md">
-                        System Overview
-                    </span>
-                    <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white drop-shadow-sm">
-                        Platform Statistics
-                    </h1>
-                    <p className="text-teal-100/80 text-sm max-w-md">
-                        Real-time core system registration metrics and system health indicators.
+            {/* Simple stacked layout container */}
+            <div className="w-full max-w-5xl flex flex-col gap-3 md:gap-4">
+                
+                {/* 1. Header Banner (Full Width, No Grid Math) */}
+                <Card className="w-full bg-gradient-to-r from-teal-600 to-teal-400 text-white p-5 md:p-6 rounded-2xl shadow-sm border-none flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span className="inline-block text-[10px] font-bold tracking-widest uppercase bg-white/20 text-white px-2.5 py-0.5 rounded-full border border-white/20 backdrop-blur-md mb-2">
+                            System Overview
+                        </span>
+                        <h2 className="text-xl md:text-2xl font-black tracking-tight text-white leading-tight">
+                            Platform Statistics
+                        </h2>
+                    </div>
+                    <p className="text-teal-50/90 text-xs font-medium max-w-sm md:text-right">
+                        Real-time core system registration metrics and continuous system health monitoring indicators.
                     </p>
-                </div>
+                </Card>
 
-                {/* Metrics Dashboard Layout Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {statCards.map((card) => (
-                        <Card 
-                            key={card.id}
-                            /* ✅ Glassmorphic Cards: Translucent dark backdrop that pops perfectly against the gradient */
-                            className="group relative overflow-hidden border border-white/10 bg-black/15 backdrop-blur-xl p-1 rounded-2xl cursor-pointer transition-all duration-300 hover:border-white/30 hover:bg-black/25 hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] active:scale-98"
-                        >
-                            {/* HeroUI v3 Card Content Mapping */}
-                            <Card.Content className="flex flex-row justify-between items-center p-5">
-                                <div className="space-y-1.5">
-                                    <p className="text-teal-100/70 text-xs font-semibold uppercase tracking-wider transition-colors duration-300 group-hover:text-white">
-                                        {card.title}
-                                    </p>
-                                    <h3 className="text-3xl font-extrabold text-white tracking-tight">
-                                        {card.value.toLocaleString()}
-                                    </h3>
-                                    <p className="text-[11px] text-teal-200/60 font-medium">
-                                        {card.subtitle}
-                                    </p>
-                                </div>
-                                
-                                {/* ✅ Modern Glass Icon Wrapper: Inverts visually into a clean solid white asset when hovered */}
-                                <div className="p-3 bg-white/10 text-white rounded-xl border border-white/10 flex items-center justify-center shadow-inner transition-all duration-300 group-hover:bg-white group-hover:text-[#0D9488] group-hover:border-white group-hover:scale-105">
-                                    {card.icon}
-                                </div>
-                            </Card.Content>
-                        </Card>
-                    ))}
+                {/* 2. Uniform Stats Grid (5 equal columns, 0 span calculations) */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+                    
+                    {/* Stat 1: Active Doctors */}
+                    <Card className="group border border-slate-200/80 bg-white hover:bg-teal-50/20 p-4 rounded-2xl transition-all duration-200 hover:border-teal-400 hover:shadow-md flex flex-col justify-between min-h-[130px]">
+                        <div className="flex items-center justify-between">
+                            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider group-hover:text-teal-700 transition-colors">
+                                Doctors
+                            </p>
+                            <div className="p-1.5 bg-teal-50 text-[#0d9488] rounded-lg border border-teal-100 flex items-center justify-center transition-all group-hover:bg-[#0d9488] group-hover:text-white">
+                                <GraduationCap style={{ fontSize: '16px' }} />
+                            </div>
+                        </div>
+                        <div className="mt-4">
+                            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight group-hover:text-[#0d9488] transition-colors">
+                                {totalDoctors.toLocaleString()}
+                            </h3>
+                            <p className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">Verified specialists</p>
+                        </div>
+                    </Card>
+
+                    {/* Stat 2: Total Patients */}
+                    <Card className="group border border-slate-200/80 bg-white hover:bg-teal-50/20 p-4 rounded-2xl transition-all duration-200 hover:border-teal-400 hover:shadow-md flex flex-col justify-between min-h-[130px]">
+                        <div className="flex items-center justify-between">
+                            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider group-hover:text-teal-700 transition-colors">
+                                Patients
+                            </p>
+                            <div className="p-1.5 bg-teal-50 text-[#0d9488] rounded-lg border border-teal-100 flex items-center justify-center transition-all group-hover:bg-[#0d9488] group-hover:text-white">
+                                <Person style={{ fontSize: '16px' }} />
+                            </div>
+                        </div>
+                        <div className="mt-4">
+                            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight group-hover:text-[#0d9488] transition-colors">
+                                {totalPatients.toLocaleString()}
+                            </h3>
+                            <p className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">Registered users</p>
+                        </div>
+                    </Card>
+
+                    {/* Stat 3: Appointments */}
+                    <Card className="group border border-slate-200/80 bg-white hover:bg-teal-50/20 p-4 rounded-2xl transition-all duration-200 hover:border-teal-400 hover:shadow-md flex flex-col justify-between min-h-[130px]">
+                        <div className="flex items-center justify-between">
+                            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider group-hover:text-teal-700 transition-colors">
+                                Bookings
+                            </p>
+                            <div className="p-1.5 bg-teal-50 text-[#0d9488] rounded-lg border border-teal-100 flex items-center justify-center transition-all group-hover:bg-[#0d9488] group-hover:text-white">
+                                <Calendar style={{ fontSize: '16px' }} />
+                            </div>
+                        </div>
+                        <div className="mt-4">
+                            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight group-hover:text-[#0d9488] transition-colors">
+                                {totalAppointments.toLocaleString()}
+                            </h3>
+                            <p className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">Consultations</p>
+                        </div>
+                    </Card>
+
+                    {/* Stat 4: Platform Reviews (Now fits single column) */}
+                    <Card className="group border border-slate-200/80 bg-white hover:bg-teal-50/20 p-4 rounded-2xl transition-all duration-200 hover:border-teal-400 hover:shadow-md flex flex-col justify-between min-h-[130px]">
+                        <div className="flex items-center justify-between">
+                            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider group-hover:text-teal-700 transition-colors">
+                                Reviews
+                            </p>
+                            <div className="p-1.5 bg-teal-50 text-[#0d9488] rounded-lg border border-teal-100 flex items-center justify-center transition-all group-hover:bg-[#0d9488] group-hover:text-white">
+                                <Star style={{ fontSize: '16px' }} />
+                            </div>
+                        </div>
+                        <div className="mt-4">
+                            <div className="flex items-center gap-2">
+                                <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight group-hover:text-[#0d9488] transition-colors">
+                                    {totalReviews}
+                                </h3>
+                                <span className="text-[9px] font-bold text-[#0d9488] bg-teal-50 px-1.5 py-0.5 rounded-md border border-teal-100">
+                                    ★ 4.9/5
+                                </span>
+                            </div>
+                            <p className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">
+                                Patient rating
+                            </p>
+                        </div>
+                    </Card>
+
+                    {/* Stat 5: System Health */}
+                    <Card className="group border border-slate-200/80 bg-white hover:bg-teal-50/20 p-4 rounded-2xl transition-all duration-200 hover:border-teal-400 hover:shadow-md flex flex-col justify-between min-h-[130px]">
+                        <div className="flex items-center justify-between">
+                            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider group-hover:text-teal-700 transition-colors">
+                                Status
+                            </p>
+                            <div className="flex items-center gap-1 bg-teal-50 px-1.5 py-0.5 rounded-md border border-teal-100">
+                                <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span>
+                                <span className="text-[9px] font-bold text-teal-700 uppercase">Live</span>
+                            </div>
+                        </div>
+                        <div className="mt-4">
+                            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight group-hover:text-[#0d9488] transition-colors">
+                                99.9%
+                            </h3>
+                            <p className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">Uptime SLA</p>
+                        </div>
+                    </Card>
+
                 </div>
             </div>
-        </div>
+        </section>
     );
 };
 

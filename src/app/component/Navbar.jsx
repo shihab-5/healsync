@@ -61,7 +61,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/70 backdrop-blur-lg shadow-sm">
+    <nav className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/70 backdrop-blur-lg shadow-2xl shadow-sm">
       <header className="flex h-16 items-center justify-between px-6 max-w-7xl mx-auto">
         
         {/* Left: Premium Stylized Logo and Name (Teal Theme) */}
@@ -240,7 +240,7 @@ export default function Navbar() {
                 <Link href="/auth/register" onClick={() => setIsOpen(false)}>
                   <Button 
                     variant="solid" 
-                    className="w-full bg-gradient-to-tr from-teal-600 to-teal-400 text-white font-semibold shadow-lg shadow-teal-500/30 rounded-full py-5"
+                    className="w-full bg-gradient-to-tr from-teal-600 to-teal-400  text-white font-semibold shadow-lg shadow-teal-500/30 rounded-full py-5"
                   >
                     Register
                   </Button>
