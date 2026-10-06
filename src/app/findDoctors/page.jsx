@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -12,7 +12,7 @@ const CATEGORIES = [
     "Pediatrics", "Dermatology", "Gynecology", "Psychiatry", "Ophthalmology"
 ];
 
-const FindDoctors = () => {
+const FindDoctorsContent = () => {
     const searchParams=useSearchParams();
     const specializationParam = searchParams.get("specialization");
     
@@ -295,6 +295,14 @@ const FindDoctors = () => {
                 </motion.div>
             </section>
         </main>
+    );
+};
+
+const FindDoctors = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <FindDoctorsContent />
+        </Suspense>
     );
 };
 
