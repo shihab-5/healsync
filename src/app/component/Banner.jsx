@@ -3,9 +3,6 @@ import Link from "next/link";
 import { Button } from "@heroui/react";
 import {
   ShieldCheck,
-  CreditCard,
-  Video,
-  FileText,
   Calendar,
   ChevronRight,
   Heart,
@@ -77,49 +74,6 @@ export default function Banner() {
               Watch How It Works
             </Button>
           </div>
-          
-         {/* Bottom Feature Badges */}
-<div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 sm:pt-6  w-full">
-  <div className="flex items-center gap-2.5">
-    <div className="w-9 h-9 rounded-xl bg-teal-400/20 border border-teal-400/50 flex items-center justify-center text-teal-600 shrink-0 shadow-sm shadow-teal-500/20">
-      <ShieldCheck className="w-4 h-4" />
-    </div>
-    <div className="flex flex-col min-w-0">
-      <p className="text-[11px] sm:text-xs font-bold text-slate-800 truncate">Verified Doctors</p>
-      <p className="text-[9px] sm:text-[10px] text-slate-500 truncate">Trusted & Certified</p>
-    </div>
-  </div>
-
-  <div className="flex items-center gap-2.5">
-    <div className="w-9 h-9 rounded-xl bg-teal-400/20 border border-teal-400/50 flex items-center justify-center text-teal-600 shrink-0 shadow-sm shadow-teal-500/20">
-      <CreditCard className="w-4 h-4" />
-    </div>
-    <div className="flex flex-col min-w-0">
-      <p className="text-[11px] sm:text-xs font-bold text-slate-800 truncate">Secure Payments</p>
-      <p className="text-[9px] sm:text-[10px] text-slate-500 truncate">100% Encrypted</p>
-    </div>
-  </div>
-
-  <div className="flex items-center gap-2.5">
-    <div className="w-9 h-9 rounded-xl bg-teal-400/20 border border-teal-400/50 flex items-center justify-center text-teal-600 shrink-0 shadow-sm shadow-teal-500/20">
-      <Video className="w-4 h-4" />
-    </div>
-    <div className="flex flex-col min-w-0">
-      <p className="text-[11px] sm:text-xs font-bold text-slate-800 truncate">Consult Online</p>
-      <p className="text-[9px] sm:text-[10px] text-slate-500 truncate">From Anywhere</p>
-    </div>
-  </div>
-
-  <div className="flex items-center gap-2.5 bg-teal50/80">
-    <div className="w-9 h-9 rounded-xl bg-teal-400/20 border border-teal-400/50 flex items-center justify-center text-teal-600 shrink-0 shadow-sm shadow-teal-500/20">
-      <FileText className="w-4 h-4" />
-    </div>
-    <div className="flex flex-col min-w-0">
-      <p className="text-[11px] sm:text-xs font-bold text-slate-800 truncate">Easy Records</p>
-      <p className="text-[9px] sm:text-[10px] text-slate-500 truncate">Track & Updated</p>
-    </div>
-  </div>
-</div>
 
         </div>
 

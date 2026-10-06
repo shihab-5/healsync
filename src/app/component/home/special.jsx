@@ -155,7 +155,7 @@ const Specializations = () => {
               className="h-full"
             >
               <Link
-                href={`/doctors?specialization=${encodeURIComponent(item.title)}`}
+                href={`/findDoctors?specialization=${encodeURIComponent(item.title)}`}
                 aria-label={`Explore ${item.title} doctors`}
                 className="group relative flex h-full min-h-52 flex-col overflow-hidden rounded-2xl border border-teal-100/80 bg-white/90 p-6 shadow-[0_4px_24px_rgba(15,118,110,0.04)] transition-all duration-300 hover:border-teal-300 hover:bg-white hover:shadow-[0_16px_40px_rgba(15,118,110,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-4"
               >

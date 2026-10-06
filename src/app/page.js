@@ -10,9 +10,9 @@ export default function Home() {
    <>
    <Banner></Banner>
    <WhyChooseUs></WhyChooseUs>
+    <Specializations></Specializations>
+     <TopDoc></TopDoc>
     <Platform></Platform>
-   <TopDoc></TopDoc>
-   <Specializations></Specializations>
    </>
   );
 }

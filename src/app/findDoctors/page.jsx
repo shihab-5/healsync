@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 // Hardcoded categories list from your layout design
 const CATEGORIES = [
@@ -12,13 +13,16 @@ const CATEGORIES = [
 ];
 
 const FindDoctors = () => {
+    const searchParams=useSearchParams();
+    const specializationParam = searchParams.get("specialization");
+    
     // State management for data, filtering, and UI interaction
     const [doctors, setDoctors] = useState([]);
     const [filteredDoctors, setFilteredDoctors] = useState([]);
     const [loading, setLoading] = useState(true);
     
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [selectedCategory, setSelectedCategory] = useState(specializationParam || "All");
     const [sortBy, setSortBy] = useState("Highest Rating");
 
     // Fetch dynamic doctor lists from your live Express Backend server instance
